@@ -8,7 +8,7 @@
   "activationCommands": {
     "atom-workspace": "coxide:toggle"
   },
-  "repository": "https://github.com/atom/coxide",
+  "repository": "https://github.com/uropsm/coxide.git",
   "license": "MIT",
   "engines": {
     "atom": ">=0.174.0 <2.0.0"
