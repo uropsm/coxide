@@ -1,0 +1,22 @@
+# See https://atom.io/docs/latest/hacking-atom-package-word-count#menus for more details
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'Toggle coxide'
+      'command': 'coxide:toggle'
+    }
+  ]
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'coxide'
+      'submenu': [
+        {
+          'label': 'Toggle'
+          'command': 'coxide:toggle'
+        }
+      ]
+    ]
+  }
+]
