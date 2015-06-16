@@ -18,5 +18,10 @@
         }
       ]
     ]
+    'label': 'Project'
+    'submenu': [
+      'label': 'Create Project'
+      'command': 'coxide:createProject'
+    ]
   }
 ]

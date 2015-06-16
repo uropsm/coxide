@@ -1,13 +1,16 @@
 CoxideView = require './coxide-view'
 {CompositeDisposable} = require 'atom'
+ipc = require 'ipc'
+fs = require 'fs-plus'
 
 module.exports = Coxide =
-  coxideView: null
-  modalPanel: null
   subscriptions: null
+  options: null
 
   activate: (state) ->
-
+    @subscriptions = new CompositeDisposable
+    @subscriptions.add atom.commands.add 'atom-workspace', 'coxide:createProject': => @createProject()
+	
   deactivate: ->
     @toolBar?.removeItems()
   
@@ -31,3 +34,12 @@ module.exports = Coxide =
     alert 'start building..'
   flash: ->
     alert 'start flashing..'
+    
+  createProject: ->
+    responseChannel = "atom-pick-folder-response"
+    ipc.on responseChannel, (path) ->
+      ipc.removeAllListeners(responseChannel)
+      fs.copySync("C:\\coxide\\BuildConfig", path[0])
+      fs.copySync("C:\\coxide\\Template", path[0])
+      atom.project.setPaths(path)
+    ipc.send('pick-folder', responseChannel)
