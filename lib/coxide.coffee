@@ -3,10 +3,11 @@ CoxideView = require './coxide-view'
 ipc = require 'ipc'
 fs = require 'fs-plus'
 
+serialPane = null
+
 module.exports = Coxide =
   subscriptions: null
-  options: null
-
+  
   activate: (state) ->
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-workspace', 'coxide:createProject': => @createProject()
@@ -21,8 +22,8 @@ module.exports = Coxide =
 
     @toolBar.addButton
       icon: 'checklist',
-      callback: @build
-      tooltip: 'Build'
+      callback: @serialPort
+      tooltip: 'Serial Port'
 
     @toolBar.addButton
       icon: 'archive',
@@ -30,8 +31,16 @@ module.exports = Coxide =
       tooltip: 'Flash'
       iconset: 'ion'
 
-  build: ->
-    alert 'start building..'
+  serialPort: ->
+    if serialPane is null
+      panes = atom.workspace.getPanes()
+      serialPane = panes.pop()
+      serialPane = serialPane.splitRight()
+      serialPane.activate()
+    else
+      serialPane.destroy()
+      serialPane = null
+            
   flash: ->
     alert 'start flashing..'
     
