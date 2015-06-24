@@ -5,9 +5,9 @@
   "version": "0.1.0",
   "keywords": [ "CoX IDE", "Serial Monitor" ],
   "window": {
-    "title": "CoX IDE - Serial Monitor",
+    "title": "CoX IDE - Serial Monitor v0.1.0",
     "icon": ".\\logo.png",
-    "toolbar": true,
+    "toolbar": false,
     "frame": true,
     "width": 800,
     "height": 500,

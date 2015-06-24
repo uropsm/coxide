@@ -34,14 +34,7 @@ module.exports = Coxide =
       iconset: 'ion'
 
   serialPort: ->
-    if serialPane is null
-      panes = atom.workspace.getPanes()
-      serialPane = panes.pop()
-      serialPane = serialPane.splitRight()
-      serialPane.activate()
-    else
-      serialPane.destroy()
-      serialPane = null
+    spawn('C:\\coxide\\serial_monitor\\nw.exe', [ '.' ], { })
 
   flash: ->
     alert 'start flashing..'
