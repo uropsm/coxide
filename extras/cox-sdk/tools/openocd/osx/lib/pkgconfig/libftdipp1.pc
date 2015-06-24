@@ -1,0 +1,11 @@
+prefix=/Users/jsjeong/Work/openocd/install/osx
+exec_prefix=/Users/jsjeong/Work/openocd/install/osx/bin
+libdir=/Users/jsjeong/Work/openocd/install/osx/lib
+includedir=/Users/jsjeong/Work/openocd/install/osx/include/libftdi1
+
+Name: libftdipp1
+Description: C++ wrapper for libftdi1
+Requires: libftdi1
+Version: 1.2
+Libs: -L${libdir} -lftdipp1
+Cflags: -I${includedir}

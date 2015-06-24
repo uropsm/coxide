@@ -1,0 +1,11 @@
+prefix=/Users/jsjeong/Work/openocd/install/osx
+exec_prefix=/Users/jsjeong/Work/openocd/install/osx/bin
+libdir=/Users/jsjeong/Work/openocd/install/osx/lib
+includedir=/Users/jsjeong/Work/openocd/install/osx/include/libftdi1
+
+Name: libftdi1
+Description: Library to program and control the FTDI USB controller
+Requires: libusb-1.0
+Version: 1.2
+Libs: -L${libdir} -lftdi1
+Cflags: -I${includedir}
