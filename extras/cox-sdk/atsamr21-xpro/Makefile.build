@@ -1,0 +1,28 @@
+# -*- mode:Makefile; -*-
+
+CC = $(PWD)/../tools/arm-none-gnu-eabi/$(OS)/bin/arm-none-eabi-gcc
+LD = $(PWD)/../tools/arm-none-gnu-eabi/$(OS)/bin/arm-none-eabi-gcc
+
+CFLAGS =\
+	-c\
+	-mcpu=cortex-m0plus\
+	-mthumb\
+	-O1\
+	-std=gnu99\
+	-Wall\
+	-Wa,-ahlms=$(notdir $(<:.c=.lst))\
+	$(addprefix -D,$(DEF))
+
+LDFLAGS =\
+	-mcpu=cortex-m0plus\
+	-mthumb\
+	-Wl,-Map,output.map,--cref,--gc-sections\
+	--specs=nano.specs\
+	-L"$(PWD)/../$(BOARD)"\
+	-Xlinker --start-group -lcoxos -Xlinker --end-group\
+	-T"$(PWD)/../$(BOARD)/cox.ld"
+
+MAKEDEPEND = $(CC) $< -M -MT $@ $(CFLAGS) -o $*.d
+
+MAKEBIN = $(PWD)/../tools/arm-none-gnu-eabi/$(OS)/bin/arm-none-eabi-objcopy -O binary output.elf output.bin
+MAKEHEX = $(PWD)/../tools/arm-none-gnu-eabi/$(OS)/bin/arm-none-eabi-objcopy -O ihex output.elf output.hex

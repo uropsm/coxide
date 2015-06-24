@@ -2,8 +2,10 @@ CoxideView = require './coxide-view'
 {CompositeDisposable} = require 'atom'
 ipc = require 'ipc'
 fs = require 'fs-plus'
+{spawn} = require 'child_process'
 
 serialPane = null
+projectPath = null
 
 module.exports = Coxide =
   subscriptions: null
@@ -40,15 +42,22 @@ module.exports = Coxide =
     else
       serialPane.destroy()
       serialPane = null
-            
+
   flash: ->
     alert 'start flashing..'
+    if projectPath is null
+        projectPath = atom.project.getPaths()[0]
+    result = spawn('C:\\coxide\\cox-sdk\\make\\program.cmd', ['-v'], { cwd: projectPath })
+    result.stdout.on "data", (data) ->
+      alert 'data : ' + data
+    result.stderr.on "data", (data) ->
+      alert 'err : ' + data
     
   createProject: ->
     responseChannel = "atom-pick-folder-response"
     ipc.on responseChannel, (path) ->
       ipc.removeAllListeners(responseChannel)
-      fs.copySync("C:\\coxide\\BuildConfig", path[0])
-      fs.copySync("C:\\coxide\\Template", path[0])
+      fs.copySync("C:\\coxide\\sample-proj", path[0])
       atom.project.setPaths(path)
+      projectPath = path
     ipc.send('pick-folder', responseChannel)
