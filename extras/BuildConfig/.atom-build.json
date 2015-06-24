@@ -1,9 +1,0 @@
-{
-  "cmd": "C:\\coxide\\tools\\make.exe",
-  "args": [ "-f", "C:\\coxide\\Makefile\\Makefile" ],
-  "sh": false,
-  "env": {
-    "PATH": "C:\\coxide\\tools\\MinGW\\bin"
-  }
-}
-
