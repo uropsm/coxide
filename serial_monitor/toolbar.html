@@ -19,8 +19,11 @@
 	<button id="toggle" class="myButton" type="button" onclick="toggle()">
 	  &nbsp;&nbsp;Connect&nbsp;&nbsp;&nbsp;
 	</button>
-	<button id="lock" class="myButton" type="button" style="float: right;" onclick="scrollLock()">
+    <button id="lock" class="myButton" type="button" style="float: right; margin-left:5px;" onclick="scrollLock()">
 	  &nbsp;&nbsp;&nbsp;Lock&nbsp;&nbsp;<img src="./icon/rsz_0071-pushpin.png">
+	</button>
+    <button id="clear" class="myButton" type="button" style="float: right;  margin-left:5px;" onclick="doClear()">
+	  &nbsp;&nbsp;&nbsp;Clear&nbsp;&nbsp;<img src="./icon/0173-bin.png">
 	</button>
 <script>   
 	var isLocked = 0;
@@ -116,6 +119,11 @@
 			doDisconnect();
 		}
 	}
+    
+    function doClear() {
+        var logView = frame.document.getElementById("logView");
+        logView.innerHTML="";
+    }
 	
 	function scrollLock() {
 		if (isLocked == 0) {
