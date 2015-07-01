@@ -27,12 +27,6 @@ module.exports = Coxide =
       callback: @serialPort
       tooltip: 'Serial Port'
 
-    @toolBar.addButton
-      icon: 'archive',
-      callback: @flash
-      tooltip: 'Flash'
-      iconset: 'ion'
-
   serialPort: ->
     spawn('C:\\coxide\\serial_monitor\\nw.exe', [ '.' ], { })
 
