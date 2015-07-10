@@ -4,7 +4,7 @@
   "version": "0.3.0",
   "description": "A short description of your package",
   "keywords": [],
-  "repository": "https://github.com/uropsm/coxide.git",
+  "repository": "http://github.com/uropsm/coxide.git",
   "license": "MIT",
   "engines": {
     "atom": ">=0.174.0 <2.0.0"

@@ -1,11 +1,11 @@
 {
   "main": "index.html",
   "name": "Serial Monitor",
-  "description": "Serial Monitor for CoX IDE",
+  "description": "Serial Monitor for Simba IDE",
   "version": "0.1.0",
-  "keywords": [ "CoX IDE", "Serial Monitor" ],
+  "keywords": [ "Simba IDE", "Serial Monitor" ],
   "window": {
-    "title": "CoX IDE - Serial Monitor v0.1.0",
+    "title": "Simba IDE - Serial Monitor v0.1.0",
     "icon": ".\\logo.png",
     "toolbar": false,
     "frame": true,
