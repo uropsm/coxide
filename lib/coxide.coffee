@@ -12,8 +12,10 @@ module.exports = Coxide =
   
   activate: (state) ->
     @subscriptions = new CompositeDisposable
-    @subscriptions.add atom.commands.add 'atom-workspace', 'coxide:createProject': => @createProject()
-	
+    @subscriptions.add atom.commands.add 'atom-workspace', 
+                'coxide:createProject': => @createProject(), 
+                'coxide:openProject': => @openProject()
+    
   deactivate: ->
     @toolBar?.removeItems()
   
@@ -39,12 +41,22 @@ module.exports = Coxide =
       alert 'data : ' + data
     result.stderr.on "data", (data) ->
       alert 'err : ' + data
-    
-  createProject: ->
-    responseChannel = "atom-pick-folder-response"
+  
+  openProject: ->
+    responseChannel = "atom-open-project-response"
     ipc.on responseChannel, (path) ->
       ipc.removeAllListeners(responseChannel)
-      fs.copySync("C:\\coxide\\sample-proj", path[0])
-      atom.project.setPaths(path)
-      projectPath = path
-    ipc.send('pick-folder', responseChannel)
+      if path isnt null 
+        atom.project.setPaths(path)
+        projectPath = path
+    ipc.send('open-project', responseChannel)
+    
+  createProject: ->
+    responseChannel = "atom-create-project-response"
+    ipc.on responseChannel, (path) ->
+      ipc.removeAllListeners(responseChannel)
+      if path isnt null 
+        fs.copySync("C:\\coxide\\sample-proj", path[0])
+        atom.project.setPaths(path)
+        projectPath = path
+    ipc.send('create-project', responseChannel)
