@@ -55,8 +55,11 @@ module.exports = Coxide =
     responseChannel = "atom-create-project-response"
     ipc.on responseChannel, (path) ->
       ipc.removeAllListeners(responseChannel)
-      if path isnt null 
-        fs.copySync("C:\\coxide\\sample-proj", path[0])
-        atom.project.setPaths(path)
-        projectPath = path
+      if path isnt null
+        if fs.existsSync(path[0] + "\\.atom-build.json") == false
+          fs.copySync("C:\\coxide\\sample-proj", path[0])
+          atom.project.setPaths(path)
+          projectPath = path
+        else
+          alert('Project exists already in this path.');
     ipc.send('create-project', responseChannel)
