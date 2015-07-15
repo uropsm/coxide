@@ -1,7 +1,0 @@
-# -*- mode:Makefile; -*-
-
-OPENOCD_PATH = $(PWD)/tools/openocd/osx
-
-all:
-	$(OPENOCD_PATH)/bin/openocd -s "$(OPENOCD_PATH)/share/openocd/scripts" -f "$(OPENOCD_PATH)/share/openocd/scripts/board/atmel_samr21_xplained_pro.cfg" -c "program output.bin verify reset exit"
-	@echo "Programming done!"
