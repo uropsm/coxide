@@ -47,8 +47,11 @@ module.exports = Coxide =
     ipc.on responseChannel, (path) ->
       ipc.removeAllListeners(responseChannel)
       if path isnt null 
-        atom.project.setPaths(path)
-        projectPath = path
+        if fs.existsSync(path[0] + "\\.atom-build.json") == true
+            atom.project.setPaths(path)
+            projectPath = path
+        else
+            alert('Failed : no available project in this path.');
     ipc.send('open-project', responseChannel)
     
   createProject: ->
@@ -57,9 +60,11 @@ module.exports = Coxide =
       ipc.removeAllListeners(responseChannel)
       if path isnt null
         if fs.existsSync(path[0] + "\\.atom-build.json") == false
-          fs.copySync("C:\\coxide\\sample-proj", path[0])
+          fs.copySync("C:\\coxide\\sample-proj\\config", path[0])
+          if fs.existsSync(path[0] + "\\main.c") == false
+            fs.copySync("C:\\coxide\\sample-proj\\template", path[0])
           atom.project.setPaths(path)
           projectPath = path
         else
-          alert('Project exists already in this path.');
+          alert('Failed : Project exists already in this path.');
     ipc.send('create-project', responseChannel)
