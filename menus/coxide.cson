@@ -3,12 +3,16 @@
     'label': 'Project'
     'submenu': [
       {
+        'label': 'Create Project'
+        'command': 'coxide:createProject'
+      },
+      {
         'label': 'Open Project'
         'command': 'coxide:openProject'
       },
       {
-        'label': 'Create Project'
-        'command': 'coxide:createProject'
+        'label': 'Close Project'
+        'command': 'coxide:closeProject'
       }
     ]
   }

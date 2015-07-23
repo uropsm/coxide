@@ -14,7 +14,8 @@ module.exports = Coxide =
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-workspace', 
                 'coxide:createProject': => @createProject(), 
-                'coxide:openProject': => @openProject()
+                'coxide:openProject': => @openProject(),
+                'coxide:closeProject': => @closeProject()
     
   deactivate: ->
     @toolBar?.removeItems()
@@ -49,6 +50,7 @@ module.exports = Coxide =
       if path isnt null 
         if fs.existsSync(path[0] + "\\.atom-build.json") == true
             atom.project.setPaths(path)
+            atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
             projectPath = path
         else
             alert('Failed : no available project in this path.');
@@ -64,7 +66,15 @@ module.exports = Coxide =
           if fs.existsSync(path[0] + "\\main.c") == false
             fs.copySync("C:\\coxide\\sample-proj\\template", path[0])
           atom.project.setPaths(path)
+          atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
           projectPath = path
         else
           alert('Failed : Project exists already in this path.');
     ipc.send('create-project', responseChannel)
+    
+  closeProject : ->
+    if projectPath isnt null
+      atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:detach')
+      atom.project.removePath(projectPath)
+      projectPath = null
+ 
