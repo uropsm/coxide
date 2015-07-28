@@ -29,6 +29,11 @@ module.exports = Coxide =
       icon: 'checklist',
       callback: @serialPort
       tooltip: 'Serial Port'
+      
+    @toolBar.addButton
+      icon: 'book',
+      callback: @guideLink
+      tooltip: 'Guide'
 
   serialPort: ->
     spawn('C:\\NOL.A\\serial_monitor\\nw.exe', [ '.' ], { })
@@ -78,3 +83,6 @@ module.exports = Coxide =
       atom.project.removePath(projectPath)
       projectPath = null
  
+  guideLink : ->
+    shell = require 'shell'
+    shell.openExternal('http://www.coxlab.kr/index.php/docs/')
