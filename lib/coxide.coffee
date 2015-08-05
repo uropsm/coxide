@@ -69,11 +69,12 @@ module.exports = Coxide =
       return
           
     if fs.existsSync(workspacePath) == true
-      projectPath = workspacePath + "\\" + projectName
-      if fs.existsSync(projectPath) == true
+      if fs.existsSync(workspacePath + "\\" + projectName) == true
         alert 'Same project already exists'
         return
+      @closeProject()
       
+      projectPath = workspacePath + "\\" + projectName
       fs.makeTreeSync(projectPath)
       fs.copySync("C:\\NOL.A\\sample-proj\\config", projectPath)
       if fs.existsSync(projectPath + "\\main.c") == false
@@ -102,20 +103,32 @@ module.exports = Coxide =
     ipc.on responseChannel, (path) ->
       ipc.removeAllListeners(responseChannel)
       if path isnt null 
-        if fs.existsSync(path[0] + "\\.atom-build.json") == true
-            atom.project.setPaths(path)
-            atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
-            projectPath = path[0]
+        if path[0] == projectPath
+          alert 'This project is already opened.' 
+        else if fs.existsSync(path[0] + "\\.atom-build.json") == true
+          Coxide.closeProject()
+          atom.project.setPaths(path)
+          atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
+          projectPath = path[0]
         else
-            alert('Failed : no available project in this path.');
+          alert 'No exist available project in this path.'
     ipc.send('open-project', responseChannel)    
+  
+  _destoryAllPanes: ->
+    panes = atom.workspace.getPanes()
+    for pane in panes
+      pane.destroy()
+    
+  _clearProject: ->
+    atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:detach')
+    atom.project.removePath(projectPath)
+    projectPath = null
   
   closeProject : ->
     if projectPath isnt null
-      atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:detach')
-      atom.project.removePath(projectPath)
-      projectPath = null
- 
+      @_destoryAllPanes()
+      @_clearProject()
+
   guideLink : ->
     shell = require 'shell'
     shell.openExternal('http://www.coxlab.kr/index.php/docs/')
