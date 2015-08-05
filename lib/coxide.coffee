@@ -72,8 +72,10 @@ module.exports = Coxide =
       if fs.existsSync(workspacePath + "\\" + projectName) == true
         alert 'Same project already exists'
         return
-      @closeProject()
-      
+        
+      if @closeProject() is false
+        return
+        
       projectPath = workspacePath + "\\" + projectName
       fs.makeTreeSync(projectPath)
       fs.copySync("C:\\NOL.A\\sample-proj\\config", projectPath)
@@ -106,7 +108,8 @@ module.exports = Coxide =
         if path[0] == projectPath
           alert 'This project is already opened.' 
         else if fs.existsSync(path[0] + "\\.atom-build.json") == true
-          Coxide.closeProject()
+          if Coxide.closeProject() is false
+            return
           atom.project.setPaths(path)
           atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
           projectPath = path[0]
@@ -114,20 +117,48 @@ module.exports = Coxide =
           alert 'No exist available project in this path.'
     ipc.send('open-project', responseChannel)    
   
-  _destoryAllPanes: ->
-    panes = atom.workspace.getPanes()
-    for pane in panes
-      pane.destroy()
-    
+  _isProjectModified: ->
+    textEditors = atom.workspace.getTextEditors()
+    for editor in textEditors
+      if editor.isModified() is true and editor.getPath() isnt null
+        path = "" + editor.getPath()
+        return true if path.indexOf(projectPath) == 0
+    return false
+ 
   _clearProject: ->
     atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:detach')
     atom.project.removePath(projectPath)
     projectPath = null
   
-  closeProject : ->
-    if projectPath isnt null
-      @_destoryAllPanes()
-      @_clearProject()
+  _closeFiles: (flag) ->
+    panes = atom.workspace.getPanes() 
+    for item in panes[0].getItems()
+      path = "" + item.getPath()
+      if path isnt null and path.indexOf(projectPath) == 0
+          if flag == 'save'
+            item.save() if item.isModified() is true  
+          item.destroy()
+
+  closeProject: ->
+    if projectPath isnt null    
+      if @_isProjectModified() is true
+        atom.confirm
+          message: 'The current project has changes. Do you want to save them? Your changes will be lost if you close without saving'
+          buttons:
+            'Save': -> 
+              Coxide._closeFiles('save')
+              Coxide._clearProject() 
+              return true
+            'Don\'t save': -> 
+              Coxide._closeFiles()
+              Coxide._clearProject()
+              return true
+            'Cancel': ->
+              return false
+      else
+        @_closeFiles()
+        @_clearProject()
+        return true
 
   guideLink : ->
     shell = require 'shell'
