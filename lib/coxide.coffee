@@ -1,14 +1,18 @@
-CoxideView = require './coxide-view'
+CreateProjectView = require './create-project-view'
 {CompositeDisposable} = require 'atom'
 ipc = require 'ipc'
 fs = require 'fs-plus'
 {spawn} = require 'child_process'
 
-serialPane = null
-projectPath = null
-
+createProjectView = null
+workspacePath: null
+projectPath: null
+projectName: null
+  
 module.exports = Coxide =
   subscriptions: null
+  modalPanel: null
+  
   
   activate: (state) ->
     @subscriptions = new CompositeDisposable
@@ -16,12 +20,24 @@ module.exports = Coxide =
                 'coxide:createProject': => @createProject(), 
                 'coxide:openProject': => @openProject(),
                 'coxide:closeProject': => @closeProject()
+                
+    createProjectView = new CreateProjectView
+    @modalPanel = atom.workspace.addModalPanel(item: createProjectView.element, visible: false)
+  
+    btnWorkspacePath = createProjectView.getElementByName('btnWorkspacePath')  
+    btnWorkspacePath.on 'click', =>  @selectWorkspacePath()
+    
+    btnDoCreateProj = createProjectView.getElementByName('btnDoCreateProj')  
+    btnDoCreateProj.on 'click', =>  @doCreateProj()
+    
+    btnCancel = createProjectView.getElementByName('btnCancel')  
+    btnCancel.on 'click', =>  @modalPanel.hide() 
     
   deactivate: ->
     @toolBar?.removeItems()
   
   serialize: ->
-
+    
   consumeToolBar: (toolBar) ->
     @toolBar = toolBar 'coxide-tool-bar'
 
@@ -38,15 +54,50 @@ module.exports = Coxide =
   serialPort: ->
     spawn('C:\\NOL.A\\serial_monitor\\nw.exe', [ '.' ], { })
 
-  flash: ->
-    alert 'start flashing..'
-    if projectPath is null
-        projectPath = atom.project.getPaths()[0]
-    result = spawn('C:\\NOL.A\\cox-sdk\\make\\program.cmd', ['-v'], { cwd: projectPath })
-    result.stdout.on "data", (data) ->
-      alert 'data : ' + data
-    result.stderr.on "data", (data) ->
-      alert 'err : ' + data
+  createProject: ->  
+    if @modalPanel.isVisible() is false
+      @modalPanel.show()
+  
+  doCreateProj:  ->
+    edtWorkspacePath = createProjectView.getElementByName('edtWorkspacePath') 
+    workspacePath = edtWorkspacePath.getModel().getText()
+    
+    edtProjName = createProjectView.getElementByName('edtProjName') 
+    projectName = edtProjName.getModel().getText()
+    
+    if projectName == ""
+      alert 'Invalid Project Name.'
+      return
+          
+    if fs.existsSync(workspacePath) == true
+      projectPath = workspacePath + "\\" + projectName
+      if fs.existsSync(projectPath) == true
+        alert 'Same project already exists'
+        return
+      
+      fs.makeTreeSync(projectPath)
+      fs.copySync("C:\\NOL.A\\sample-proj\\config", projectPath)
+      if fs.existsSync(projectPath + "\\main.c") == false
+        fs.copySync("C:\\NOL.A\\sample-proj\\template", projectPath)
+  
+      atom.project.setPaths([projectPath])
+      atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
+      atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:refresh-target')
+      @modalPanel.hide()
+    else
+      alert 'Invalid Workspace Path.'
+      
+  selectWorkspacePath: ->
+    responseChannel = "atom-create-project-response"
+    ipc.on responseChannel, (path) ->
+      ipc.removeAllListeners(responseChannel)
+      if path isnt null
+        if fs.existsSync(path[0] + "\\.atom-build.json") == false
+          edtWorkspacePath = createProjectView.getElementByName('edtWorkspacePath') 
+          edtWorkspacePath.getModel().setText(path[0])
+        else
+          alert('Project exists already in this path.');
+    ipc.send('create-project', responseChannel)
   
   openProject: ->
     responseChannel = "atom-open-project-response"
@@ -56,27 +107,12 @@ module.exports = Coxide =
         if fs.existsSync(path[0] + "\\.atom-build.json") == true
             atom.project.setPaths(path)
             atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
-            projectPath = path
+            atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:refresh-target')
+            projectPath = path[0]
         else
             alert('Failed : no available project in this path.');
-    ipc.send('open-project', responseChannel)
-    
-  createProject: ->
-    responseChannel = "atom-create-project-response"
-    ipc.on responseChannel, (path) ->
-      ipc.removeAllListeners(responseChannel)
-      if path isnt null
-        if fs.existsSync(path[0] + "\\.atom-build.json") == false
-          fs.copySync("C:\\NOL.A\\sample-proj\\config", path[0])
-          if fs.existsSync(path[0] + "\\main.c") == false
-            fs.copySync("C:\\NOL.A\\sample-proj\\template", path[0])
-          atom.project.setPaths(path)
-          atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
-          projectPath = path
-        else
-          alert('Failed : Project exists already in this path.');
-    ipc.send('create-project', responseChannel)
-    
+    ipc.send('open-project', responseChannel)    
+  
   closeProject : ->
     if projectPath isnt null
       atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:detach')
