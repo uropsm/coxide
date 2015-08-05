@@ -5,14 +5,13 @@ fs = require 'fs-plus'
 {spawn} = require 'child_process'
 
 createProjectView = null
-workspacePath: null
-projectPath: null
-projectName: null
+workspacePath = null
+projectPath = null
+projectName = null
   
 module.exports = Coxide =
   subscriptions: null
   modalPanel: null
-  
   
   activate: (state) ->
     @subscriptions = new CompositeDisposable
@@ -82,7 +81,6 @@ module.exports = Coxide =
   
       atom.project.setPaths([projectPath])
       atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
-      atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:refresh-target')
       @modalPanel.hide()
     else
       alert 'Invalid Workspace Path.'
@@ -107,7 +105,6 @@ module.exports = Coxide =
         if fs.existsSync(path[0] + "\\.atom-build.json") == true
             atom.project.setPaths(path)
             atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
-            atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:refresh-target')
             projectPath = path[0]
         else
             alert('Failed : no available project in this path.');

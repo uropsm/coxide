@@ -18,7 +18,7 @@ class CreateProjectView extends View
       
       @h2 ""
       @div class: 'coxide-align-center', =>
-        @button outlet: 'btnDoCreateProj', class: 'btn btn-size15 icon icon-flame', 'Do it'
+        @button outlet: 'btnDoCreateProj', class: 'btn btn-size15 icon icon-flame', 'Done'
       
   initialize: () ->
     
