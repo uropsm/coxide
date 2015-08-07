@@ -132,12 +132,13 @@ module.exports = Coxide =
   
   _closeFiles: (flag) ->
     panes = atom.workspace.getPanes() 
-    for item in panes[0].getItems()
-      path = "" + item.getPath()
-      if path isnt null and path.indexOf(projectPath) == 0
-          if flag == 'save'
-            item.save() if item.isModified() is true  
-          item.destroy()
+    for pane in panes 
+      for item in pane.getItems()
+        path = "" + item.getPath()
+        if path isnt null and path.indexOf(projectPath) == 0
+            if flag == 'save'
+              item.save() if item.isModified() is true  
+            item.destroy()
 
   closeProject: ->
     if projectPath isnt null    
