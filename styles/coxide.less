@@ -2,9 +2,10 @@
 //
 // See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
 // for a full listing of what's available.
+
 @import "ui-variables";
 
-.coxide {
+.coxide {  
   .btn-open-folder {
     width: 35px;
     height: 25px;
@@ -13,7 +14,7 @@
   .btn-size15 {
     font-size: 15px;
   }
-  
+
   atom-text-editor[mini] {
     display: inline-block;
     width: 93%;
@@ -24,3 +25,80 @@
   text-align: center;
 }
 
+.coxide-tool-bar {
+  @size: 48px;
+  @button-margin-size: 2px;
+  @button-border-size: 1px;
+  background-color: @base-background-color;
+  border: 1px solid @base-border-color;
+  color: @text-color;
+  
+  button.tool-bar-btn {
+    background-color: @base-background-color;
+    background-image: inherit;
+    border-color: @base-background-color;
+    cursor: pointer;
+    flex: 0 0 auto;
+    margin: @button-margin-size;
+    padding: 0;
+
+    &:before {
+      display: inline;
+    }
+    &:focus,
+    &:hover {
+      border-color: @button-border-color;
+      outline: none;
+    }
+  }
+  
+  button.tool-bar-long-btn {
+    background-color: @base-background-color;
+    background-image: inherit;
+    border-color: @base-background-color;
+    cursor: pointer;
+    flex: 0 0 auto;
+    margin: @button-margin-size;
+    padding: 0;
+    text-align: left;
+    font-size: 18px;
+    padding-left: 10px;
+    
+    line-height: @size;
+    height: @size + (@button-border-size * 2);
+    width: 300px + (@button-border-size * 2);
+    &:before {
+      display: inline;
+      font-size: @size / 2;
+      line-height: @size;
+    }
+    &:focus,
+    &:hover {
+      border-color: @button-border-color;
+      outline: none;
+    }
+  }
+  
+  &.tool-bar-16px {
+    .tool-bar-size(16px * 2);
+  }
+  &.tool-bar-24px {
+    .tool-bar-size(24px * 2);
+  }
+  &.tool-bar-32px {
+    .tool-bar-size(32px * 2);
+  }
+  
+  .tool-bar-size(@size) {
+    line-height: @size;
+    
+    .tool-bar-btn {
+      height: @size + (@button-border-size * 2);
+      width: @size + (@button-border-size * 2);
+      &:before {
+        font-size: @size / 2;
+        line-height: @size;
+      }
+    }
+  }
+}

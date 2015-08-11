@@ -1,8 +1,13 @@
 CreateProjectView = require './create-project-view'
+TopToolbarView = require './top-toolbar-view'
+ToolbarButtonView = require './toolbar-button-view'
+DeviceSelectView = require './device-select-view'
 {CompositeDisposable} = require 'atom'
 ipc = require 'ipc'
 fs = require 'fs-plus'
 {spawn} = require 'child_process'
+{View} = require 'space-pen'
+{SelectListView} = require 'atom-space-pen-views'
 
 createProjectView = null
 workspacePath = null
@@ -12,6 +17,7 @@ projectName = null
 module.exports = Coxide =
   subscriptions: null
   modalPanel: null
+  topToolbarView: null
   
   activate: (state) ->
     @subscriptions = new CompositeDisposable
@@ -25,13 +31,30 @@ module.exports = Coxide =
   
     btnWorkspacePath = createProjectView.getElementByName('btnWorkspacePath')  
     btnWorkspacePath.on 'click', =>  @selectWorkspacePath()
-    
     btnDoCreateProj = createProjectView.getElementByName('btnDoCreateProj')  
     btnDoCreateProj.on 'click', =>  @doCreateProj()
-    
     btnCancel = createProjectView.getElementByName('btnCancel')  
     btnCancel.on 'click', =>  @modalPanel.hide() 
+
+    @topToolbarView = new TopToolbarView()
+    atom.workspace.addTopPanel item: @topToolbarView
     
+    guideOpt = {
+      tooltip: "Guide",
+      icon: "book",
+      callback: @guideLink
+    }
+    guideBtn = new ToolbarButtonView(guideOpt)
+    @topToolbarView.addItem(guideBtn)
+    
+    serialOpt = {
+      tooltip: "Serial Port",
+      icon: "checklist",
+      callback: @serialPort
+    }
+    serialBtn = new ToolbarButtonView(serialOpt)
+    @topToolbarView.addItem(serialBtn)
+  
   deactivate: ->
     @toolBar?.removeItems()
   
