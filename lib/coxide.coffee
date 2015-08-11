@@ -59,19 +59,6 @@ module.exports = Coxide =
     @toolBar?.removeItems()
   
   serialize: ->
-    
-  consumeToolBar: (toolBar) ->
-    @toolBar = toolBar 'coxide-tool-bar'
-
-    @toolBar.addButton
-      icon: 'checklist',
-      callback: @serialPort
-      tooltip: 'Serial Port'
-      
-    @toolBar.addButton
-      icon: 'book',
-      callback: @guideLink
-      tooltip: 'Guide'
 
   serialPort: ->
     spawn('C:\\NOL.A\\serial_monitor\\nw.exe', [ '.' ], { })

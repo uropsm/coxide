@@ -15,13 +15,5 @@
     "fs-plus": "^2.8.0"
   },
   "packagDependencies": {
-    "tool-bar": "^0.1.0"
-  },
-  "consumedServices": {
-    "tool-bar": {
-      "versions": {
-        "^0.1.0": "consumeToolBar"
-      }
-    }
   }
 }
