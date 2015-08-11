@@ -51,7 +51,7 @@ class DeviceSelectView extends SelectListView
   toggle: ->
     if @panel?
       @cancel()
-    else if @editor = atom.workspace.getActiveTextEditor()
+    else
       @setItems(deviceList)
       @attach()
       
