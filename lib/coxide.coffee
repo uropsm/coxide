@@ -107,7 +107,7 @@ module.exports = Coxide =
           edtWorkspacePath = createProjectView.getElementByName('edtWorkspacePath') 
           edtWorkspacePath.getModel().setText(path[0])
         else
-          alert('Project exists already in this path.');
+          alert('The selected path is including a project. Please select another path for workspace.');
     ipc.send('create-project', responseChannel)
   
   openProject: ->
