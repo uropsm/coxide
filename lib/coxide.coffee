@@ -1,7 +1,6 @@
 CreateProjectView = require './create-project-view'
 TopToolbarView = require './top-toolbar-view'
 ToolbarButtonView = require './toolbar-button-view'
-DeviceSelectView = require './device-select-view'
 {CompositeDisposable} = require 'atom'
 ipc = require 'ipc'
 fs = require 'fs-plus'
@@ -123,6 +122,7 @@ module.exports = Coxide =
           atom.project.setPaths(path)
           atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
           projectPath = path[0]
+          Coxide._loadTargetDevice()
         else
           alert 'No exist available project in this path.'
     ipc.send('open-project', responseChannel)    
@@ -139,6 +139,10 @@ module.exports = Coxide =
     atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:detach')
     atom.project.removePath(projectPath)
     projectPath = null
+    @topToolbarView.clearTargetDevice()
+  
+  _loadTargetDevice: ->
+    @topToolbarView.loadTargetDevice()
   
   _closeFiles: (flag) ->
     panes = atom.workspace.getPanes() 

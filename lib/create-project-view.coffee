@@ -13,7 +13,7 @@ class CreateProjectView extends View
       @subview 'edtProjName', new TextEditorView(mini: true, placeholderText: 'Please type new project name')
         
       @h2 "Workspace Path :"
-      @subview 'edtWorkspacePath', new TextEditorView(mini: true, placeholderText: 'Project folder will be created in this directory')
+      @subview 'edtWorkspacePath', new TextEditorView(mini: true, placeholderText: 'New Project will be created in workspace')
       @button outlet: 'btnWorkspacePath', class: 'btn btn-open-folder icon icon-file-directory pull-right'
       
       @h2 ""
