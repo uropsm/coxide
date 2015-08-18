@@ -12,6 +12,7 @@ createProjectView = null
 workspacePath = null
 projectPath = null
 projectName = null
+installPath = null
   
 module.exports = Coxide =
   subscriptions: null
@@ -19,11 +20,15 @@ module.exports = Coxide =
   topToolbarView: null
   
   activate: (state) ->
+    installPath = atom.config.get('coxide.installPath')
+    
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-workspace', 
                 'coxide:createProject': => @createProject(), 
                 'coxide:openProject': => @openProject(),
-                'coxide:closeProject': => @closeProject()
+                'coxide:closeProject': => @closeProject(),
+                'coxide:viewVersion': => @viewVersion(),
+                'coxide:viewLicense': => @viewLicense()
                 
     createProjectView = new CreateProjectView
     @modalPanel = atom.workspace.addModalPanel(item: createProjectView.element, visible: false)
@@ -60,7 +65,7 @@ module.exports = Coxide =
   serialize: ->
 
   serialPort: ->
-    spawn('C:\\NOL.A\\serial_monitor\\nw.exe', [ '.' ], { })
+    spawn(installPath + '\\NOL.A\\serial_monitor\\nw.exe', [ '.' ], { })
 
   createProject: ->  
     if @modalPanel.isVisible() is false
@@ -87,9 +92,9 @@ module.exports = Coxide =
         
       projectPath = workspacePath + "\\" + projectName
       fs.makeTreeSync(projectPath)
-      fs.copySync("C:\\NOL.A\\sample-proj\\config", projectPath)
+      fs.copySync(installPath + "\\NOL.A\\sample-proj\\config", projectPath)
       if fs.existsSync(projectPath + "\\main.c") == false
-        fs.copySync("C:\\NOL.A\\sample-proj\\template", projectPath)
+        fs.copySync(installPath + "\\NOL.A\\sample-proj\\template", projectPath)
   
       atom.project.setPaths([projectPath])
       atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
@@ -175,6 +180,13 @@ module.exports = Coxide =
         @_clearProject()
         return true
 
-  guideLink : ->
+  guideLink: ->
     shell = require 'shell'
     shell.openExternal('http://www.coxlab.kr/index.php/docs/')
+    
+  viewVersion: ->
+    alert 'Nol.A IDE version 0.13.0\nCopyright 2015 CoXlab Inc. All rights reserved.'
+    
+  viewLicense: ->
+    atom.workspace.open(installPath + "\\Nol.A\\Atom\\resources\\LICENSE.md")
+  

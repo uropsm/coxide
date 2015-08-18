@@ -15,5 +15,18 @@
         'command': 'coxide:closeProject'
       }
     ]
+  },
+  {
+    'label': 'Help'
+    'submenu': [
+      {
+        'label': 'View License'
+        'command': 'coxide:viewLicense'
+      },
+      {
+        'label': 'View Version Info.'
+        'command': 'coxide:viewVersion'
+      }
+    ]
   }
 ]
