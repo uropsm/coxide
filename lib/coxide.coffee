@@ -65,7 +65,7 @@ module.exports = Coxide =
   serialize: ->
 
   serialPort: ->
-    spawn(installPath + '\\NOL.A\\serial_monitor\\nw.exe', [ '.' ], { })
+    spawn(installPath + '\\Nol.A\\serial_monitor\\nw.exe', [ '.' ], { })
 
   createProject: ->  
     if @modalPanel.isVisible() is false
@@ -92,9 +92,9 @@ module.exports = Coxide =
         
       projectPath = workspacePath + "\\" + projectName
       fs.makeTreeSync(projectPath)
-      fs.copySync(installPath + "\\NOL.A\\sample-proj\\config", projectPath)
+      fs.copySync(installPath + "\\Nol.A\\sample-proj\\config", projectPath)
       if fs.existsSync(projectPath + "\\main.c") == false
-        fs.copySync(installPath + "\\NOL.A\\sample-proj\\template", projectPath)
+        fs.copySync(installPath + "\\Nol.A\\sample-proj\\template", projectPath)
   
       atom.project.setPaths([projectPath])
       atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
