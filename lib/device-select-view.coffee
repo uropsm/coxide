@@ -6,23 +6,7 @@ deviceList = [
             {
               name: "Atmel SAMR21 Xplained pro",
               flag: "SAMR21"
-            },
-            {
-              name: "Device A",
-              flag: "AAA"
-            },
-            {
-              name: "Device B",
-              flag: "BBB"
-            },
-            {
-              name: "Device C",
-              flag: "CCC"
-            },
-            {
-              name: "Device D",
-              flag: "DDD"
-            },
+            }
          ]           
 
 module.exports =
