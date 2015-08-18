@@ -1,7 +1,7 @@
 {
   "name": "coxide",
   "main": "./lib/coxide",
-  "version": "0.10.0",
+  "version": "1.0.0",
   "description": "A short description of your package",
   "keywords": [],
   "repository": "http://github.com/uropsm/coxide.git",
@@ -14,6 +14,5 @@
     "atom-space-pen-views": "^2.0.3",
     "fs-plus": "^2.8.0"
   },
-  "packagDependencies": {
-  }
+  "packagDependencies": {}
 }
