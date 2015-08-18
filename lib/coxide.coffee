@@ -185,7 +185,7 @@ module.exports = Coxide =
     shell.openExternal('http://www.coxlab.kr/index.php/docs/')
     
   viewVersion: ->
-    alert 'Nol.A IDE version 0.13.0\nCopyright 2015 CoXlab Inc. All rights reserved.'
+    alert 'Nol.A IDE version 0.14.0\nCopyright 2015 CoXlab Inc. All rights reserved.'
     
   viewLicense: ->
     atom.workspace.open(installPath + "\\Nol.A\\Atom\\resources\\LICENSE.md")
