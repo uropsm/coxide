@@ -1,7 +1,7 @@
 {
   "name": "coxide",
   "main": "./lib/coxide",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "A short description of your package",
   "keywords": [],
   "repository": "http://github.com/uropsm/coxide.git",
