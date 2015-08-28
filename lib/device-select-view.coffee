@@ -5,7 +5,15 @@ currentDevice = null
 deviceList = [
             {
               name: "Atmel SAMR21 Xplained pro",
-              flag: "SAMR21"
+              flag: "atsamr21-xpro"
+            },
+            {
+              name: "ETRI-E900-SGDK",
+              flag: "etri-e900-sgdk"
+            },
+            {
+              name: "TI TrxEB",
+              flag: "trxeb"
             }
          ]           
 
@@ -28,7 +36,10 @@ class DeviceSelectView extends SelectListView
     element.classList.add('active') if device is currentDevice
     element.textContent = device.name
     element
-
+  
+  getFilterKey: ->
+    'name'
+  
   cancelled: ->
     @panel?.destroy()
     @panel = null
