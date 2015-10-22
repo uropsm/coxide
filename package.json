@@ -12,7 +12,9 @@
   "dependencies": {
     "space-pen": "5.1.1",
     "atom-space-pen-views": "^2.0.3",
-    "fs-plus": "^2.8.0"
+    "fs-plus": "^2.8.0",
+    "request": "2.63.0",
+    "unzip": "0.1.11"
   },
   "packagDependencies": {}
 }

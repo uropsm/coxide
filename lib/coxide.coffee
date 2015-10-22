@@ -1,4 +1,5 @@
 CreateProjectView = require './create-project-view'
+UpdateView = require './update-view'
 TopToolbarView = require './top-toolbar-view'
 ToolbarButtonView = require './toolbar-button-view'
 {CompositeDisposable} = require 'atom'
@@ -7,6 +8,7 @@ fs = require 'fs-plus'
 {spawn} = require 'child_process'
 {View} = require 'space-pen'
 {SelectListView} = require 'atom-space-pen-views'
+request = require 'request'
 
 createProjectView = null
 workspacePath = null
@@ -21,6 +23,7 @@ module.exports = Coxide =
   
   activate: (state) ->
     installPath = atom.config.get('coxide.installPath')
+    serverURL = atom.config.get('coxide.serverURL')
     
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-workspace', 
@@ -32,13 +35,18 @@ module.exports = Coxide =
                 
     createProjectView = new CreateProjectView
     @modalPanel = atom.workspace.addModalPanel(item: createProjectView.element, visible: false)
-  
+
+    request serverURL + '/lib-latest-version', (error, response, body) ->
+      if error is null
+        if body isnt "0"
+          Coxide.updateCheck(JSON.parse(body))
+
     btnWorkspacePath = createProjectView.getElementByName('btnWorkspacePath')  
     btnWorkspacePath.on 'click', =>  @selectWorkspacePath()
     btnDoCreateProj = createProjectView.getElementByName('btnDoCreateProj')  
     btnDoCreateProj.on 'click', =>  @doCreateProj()
     btnCancel = createProjectView.getElementByName('btnCancel')  
-    btnCancel.on 'click', =>  @modalPanel.hide() 
+    btnCancel.on 'click', =>  @modalPanel.hide()
 
     @topToolbarView = new TopToolbarView()
     atom.workspace.addTopPanel item: @topToolbarView
@@ -58,7 +66,7 @@ module.exports = Coxide =
     }
     serialBtn = new ToolbarButtonView(serialOpt)
     @topToolbarView.addItem(serialBtn)
-  
+
   deactivate: ->
     @toolBar?.removeItems()
   
@@ -186,7 +194,34 @@ module.exports = Coxide =
     
   viewVersion: ->
     alert 'Nol.A IDE version 0.17.0\nCopyright 2015 CoXlab Inc. All rights reserved.'
-    
+
   viewLicense: ->
     atom.workspace.open(installPath + "\\Nol.A\\Atom\\resources\\LICENSE.md")
-  
+
+  updateCheck: (libInfo) ->
+    updateList = []
+    libVersions = atom.config.get('coxide.libVersions')
+    for i in [0...libVersions.length]
+      for j in [0...libInfo.length]
+        if libVersions[i].libType == libInfo[j].libType
+          if libVersions[i].libVersion != libInfo[j].libVersion
+            updateList.push({ libType: libVersions[i].libType, \
+                              libOldVer: libVersions[i].libVersion, \
+                              libNewVer: libInfo[j].libVersion })
+            break
+   
+    if updateList.length > 0
+      noti = atom.notifications.addInfo "New Update For Libraries!",
+          dismissable: true,
+          buttons: [{
+            text: 'Update'
+            className: 'btn-updateDo'
+            onDidClick: -> 
+              noti.dismiss()
+              Coxide.doUpdate(updateList)
+          }]
+
+  doUpdate: (updateList) ->
+    updateView = new UpdateView(updateList)
+    updatePanel = atom.workspace.addModalPanel(item: updateView.element, visible: true)
+    updateView.setPanel(updatePanel)
