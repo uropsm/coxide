@@ -31,7 +31,8 @@ module.exports = Coxide =
                 'coxide:openProject': => @openProject(),
                 'coxide:closeProject': => @closeProject(),
                 'coxide:viewVersion': => @viewVersion(),
-                'coxide:viewLicense': => @viewLicense()
+                'coxide:viewLicense': => @viewLicense(),
+                'coxide:libUpdate': => @libUpdate()
                 
     createProjectView = new CreateProjectView
     @modalPanel = atom.workspace.addModalPanel(item: createProjectView.element, visible: false)
@@ -39,7 +40,7 @@ module.exports = Coxide =
     request serverURL + '/lib-latest-version', (error, response, body) ->
       if error is null
         if body isnt "0"
-          Coxide.updateCheck(JSON.parse(body))
+          Coxide.updateCheck(JSON.parse(body), false)
 
     btnWorkspacePath = createProjectView.getElementByName('btnWorkspacePath')  
     btnWorkspacePath.on 'click', =>  @selectWorkspacePath()
@@ -198,7 +199,14 @@ module.exports = Coxide =
   viewLicense: ->
     atom.workspace.open(installPath + "\\Nol.A\\Atom\\resources\\LICENSE.md")
 
-  updateCheck: (libInfo) ->
+  libUpdate: ->
+    serverURL = atom.config.get('coxide.serverURL')
+    request serverURL + '/lib-latest-version', (error, response, body) ->
+      if error is null
+        if body isnt "0"
+          Coxide.updateCheck(JSON.parse(body), true)
+
+  updateCheck: (libInfo, feedback) ->
     updateList = []
     libVersions = atom.config.get('coxide.libVersions')
     for i in [0...libVersions.length]
@@ -220,6 +228,9 @@ module.exports = Coxide =
               noti.dismiss()
               Coxide.doUpdate(updateList)
           }]
+    else 
+      if feedback == true
+        atom.notifications.addInfo "You already have the latest version!"
 
   doUpdate: (updateList) ->
     updateView = new UpdateView(updateList)
