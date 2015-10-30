@@ -59,29 +59,27 @@ class UpdateView extends View
           rmdir.sync filePath + "include"
           rmdir.sync filePath + "make"
           extractPath = filePath
+        else
+          rmdir.sync filePath + libType
         
-        rmdir filePath + libType, (error)->
-          if error isnt null
-            alert 'Can not remove old lib folder of ' + libType + " - " + error
-          else
-            file = fs.createWriteStream(filePath + fileName)
-            request.get url + libType 
-              .pipe file
-            file.on 'finish', =>  
-              file.close();
-              prog.value = 50
-              zipFile = fs.createReadStream(filePath + fileName)
-                .pipe(unzip.Extract({ path: extractPath }));
-              zipFile.on 'close', =>
-                fs.unlink(filePath + fileName) 
-                for i in [0...libVersions.length]
-                  if libVersions[i].libType == libType
-                    libVersions[i].libVersion = libNewVer
-                    break                
-                prog.value = 100
-                
-                # count '0' means all is done.
-                count = count - 1
-                if count == 0 
-                  atom.config.set('coxide.libVersions', libVersions)
-                  alert 'Update completed'
+        file = fs.createWriteStream(filePath + fileName)
+        request.get url + libType 
+          .pipe file
+        file.on 'finish', =>  
+          file.close();
+          prog.value = 50
+          zipFile = fs.createReadStream(filePath + fileName)
+            .pipe(unzip.Extract({ path: extractPath }));
+          zipFile.on 'close', =>
+            fs.unlink(filePath + fileName) 
+            for i in [0...libVersions.length]
+              if libVersions[i].libType == libType
+                libVersions[i].libVersion = libNewVer
+                break                
+            prog.value = 100
+            
+            # count '0' means all is done.
+            count = count - 1
+            if count == 0 
+              atom.config.set('coxide.libVersions', libVersions)
+              alert 'Update completed'
