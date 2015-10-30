@@ -36,7 +36,8 @@ module.exports = Coxide =
                 
     createProjectView = new CreateProjectView
     @modalPanel = atom.workspace.addModalPanel(item: createProjectView.element, visible: false)
-
+  
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
     request serverURL + '/lib-latest-version', (error, response, body) ->
       if error is null
         if body isnt "0"
