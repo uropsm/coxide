@@ -1,6 +1,7 @@
 {$, View} = require 'space-pen'
 request = require 'request'
 fs = require 'fs-plus'
+rmdir = require 'rimraf'
 unzip = require 'unzip'
 
 module.exports =
@@ -41,37 +42,46 @@ class UpdateView extends View
   doUpdate: ->
     count = @updateListDiv.children().length
     libVersions = atom.config.get('coxide.libVersions')
-
-    for item in @updateListDiv.children()
-      installPath = atom.config.get('coxide.installPath')
-      serverURL = atom.config.get('coxide.serverURL')
-      url = serverURL + '/lib-download/'
-      
+    installPath = atom.config.get('coxide.installPath')
+    serverURL = atom.config.get('coxide.serverURL')
+    url = serverURL + '/lib-download/'
+    
+    for item in @updateListDiv.children()  
       libType = $(item).find('label').text()
       libNewVer = $(item).find('span').text()
       prog = $(item).find('progress')[0]
-      filePath = installPath + "\\NOL.A\\cox-sdk\\" + libType + "\\"
+      filePath = installPath + "\\NOL.A\\cox-sdk\\"
       fileName = libType + ".zip"
       
-      file = fs.createWriteStream(filePath + fileName)
-      do (url, prog, file, filePath, fileName, libType, libNewVer) ->
-        request.get url + libType 
-          .pipe file
-        file.on 'finish', =>  
-          file.close();
-          prog.value = 50
-          zipFile = fs.createReadStream(filePath + fileName)
-            .pipe(unzip.Extract({ path: filePath }));
-          zipFile.on 'close', =>
-            fs.unlink(filePath + fileName) 
-            for i in [0...libVersions.length]
-              if libVersions[i].libType == libType
-                libVersions[i].libVersion = libNewVer
-                break                
-            prog.value = 100
-            
-            # count '0' means all is done.
-            count = count - 1
-            if count == 0 
-              atom.config.set('coxide.libVersions', libVersions)
-              alert 'Update completed'
+      do (url, prog, filePath, fileName, libType, libNewVer) ->
+        extractPath = filePath + libType
+        if libType == "builder"
+          rmdir.sync filePath + "include"
+          rmdir.sync filePath + "make"
+          extractPath = filePath
+        
+        rmdir filePath + libType, (error)->
+          if error isnt null
+            alert 'Can not remove old lib folder of ' + libType + " - " + error
+          else
+            file = fs.createWriteStream(filePath + fileName)
+            request.get url + libType 
+              .pipe file
+            file.on 'finish', =>  
+              file.close();
+              prog.value = 50
+              zipFile = fs.createReadStream(filePath + fileName)
+                .pipe(unzip.Extract({ path: extractPath }));
+              zipFile.on 'close', =>
+                fs.unlink(filePath + fileName) 
+                for i in [0...libVersions.length]
+                  if libVersions[i].libType == libType
+                    libVersions[i].libVersion = libNewVer
+                    break                
+                prog.value = 100
+                
+                # count '0' means all is done.
+                count = count - 1
+                if count == 0 
+                  atom.config.set('coxide.libVersions', libVersions)
+                  alert 'Update completed'
