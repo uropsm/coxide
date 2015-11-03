@@ -216,11 +216,24 @@ module.exports = Coxide =
       for j in [0...libInfo.length]
         if libVersions[i].libType == libInfo[j].libType
           if libVersions[i].libVersion != libInfo[j].libVersion
-            updateList.push({ libType: libVersions[i].libType, \
+            updateList.push({ libName: libVersions[i].libName, \
+                              libType: libVersions[i].libType, \
                               libOldVer: libVersions[i].libVersion, \
                               libNewVer: libInfo[j].libVersion })
             break
-   
+    
+    if libInfo.length > libVersions.length
+      # find new library type.
+      for i in [0...libInfo.length]
+        for j in [0...libVersions.length]
+          if libInfo[i].libType == libVersions[j].libType
+            break
+          if j == libVersions.length-1
+            updateList.push({ libName: libInfo[i].libName, \
+                              libType: libInfo[i].libType, \
+                              libOldVer: "NEW", \
+                              libNewVer: libInfo[i].libVersion })
+
     if updateList.length > 0
       noti = atom.notifications.addInfo "New Update For Libraries!",
           dismissable: true,

@@ -2,20 +2,7 @@
 fs = require 'fs-plus'
 
 currentDevice = null
-deviceList = [
-            {
-              name: "Atmel SAMR21 Xplained pro",
-              flag: "atsamr21-xpro"
-            },
-            {
-              name: "ETRI-E900-SGDK",
-              flag: "etri-e900-sgdk"
-            },
-            {
-              name: "TI TrxEB",
-              flag: "trxeb"
-            }
-         ]           
+deviceList = []           
 
 module.exports =
 class DeviceSelectView extends SelectListView  
@@ -23,7 +10,7 @@ class DeviceSelectView extends SelectListView
   
   initialize: (btnDevSel) ->
     super
-
+    @reloadDevList()
     @btnDevSelect = btnDevSel
     @addClass('grammar-selector')
     @list.addClass('mark-active')
@@ -34,11 +21,11 @@ class DeviceSelectView extends SelectListView
   viewForItem: (device) ->
     element = document.createElement('li')
     element.classList.add('active') if device is currentDevice
-    element.textContent = device.name
+    element.textContent = device.libName
     element
   
   getFilterKey: ->
-    'name'
+    'libName'
   
   cancelled: ->
     @panel?.destroy()
@@ -49,8 +36,15 @@ class DeviceSelectView extends SelectListView
     if @writeDevModel(device) is false
       return
     currentDevice = device
-    @btnDevSelect.text device.name
+    @btnDevSelect.text device.libName
     @cancel()
+    
+  reloadDevList: ->
+    deviceList = atom.config.get('coxide.libVersions')   
+    for i in [0...deviceList.length]
+      if deviceList[i].libType == "builder"
+        deviceList.splice(i, 1)
+        break
 
   writeDevModel: (device) ->
     currentProjPath = atom.project.getPaths()[0]
@@ -61,22 +55,22 @@ class DeviceSelectView extends SelectListView
       
     try 
       jsonData = JSON.parse(fs.readFileSync(jsonFilePath).toString())
-      jsonData.args = [ device.flag ]
+      jsonData.args = [ device.libType ]
       fs.writeFileSync(jsonFilePath, JSON.stringify(jsonData, null, ' '))
       return true
     catch e
-      alert 'Error : Invalied .atom-build.json file.'
+      alert 'Error : Invalid .atom-build.json file.'
       return false
   
   _getDeviceByName: (name) ->
     for dev in deviceList
-      if name == dev.name
+      if name == dev.libName
         return dev
     return null
   
-  _getDeviceByFlag: (flag) ->
+  _getDeviceByType: (type) ->
     for dev in deviceList
-      if flag == dev.flag
+      if type == dev.libType
         return dev
     return null
   
@@ -86,14 +80,14 @@ class DeviceSelectView extends SelectListView
 
     try 
       jsonData = JSON.parse(fs.readFileSync(jsonFilePath).toString()) 
-      currentDevice = @_getDeviceByFlag(jsonData.args[0])
+      currentDevice = @_getDeviceByType(jsonData.args[0])
       @populateList()
       if currentDevice isnt null
-        @btnDevSelect.text currentDevice.name
+        @btnDevSelect.text currentDevice.libName
       else  
         @btnDevSelect.text 'Select Your Device'
     catch e
-      alert 'Error : Invalied .atom-build.json file.'
+      alert 'Error : Invalid .atom-build.json file.'
     
   clearDevice: ->
     currentDevice = null
@@ -111,3 +105,4 @@ class DeviceSelectView extends SelectListView
     else
       @setItems(deviceList)
       @attach()
+
