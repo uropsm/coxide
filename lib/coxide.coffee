@@ -218,23 +218,29 @@ module.exports = Coxide =
       for j in [0...libInfo.length]
         if libVersions[i].libType == libInfo[j].libType
           if libVersions[i].libVersion != libInfo[j].libVersion
+            # Found new version of existing library.
             updateList.push({ libName: libVersions[i].libName, \
                               libType: libVersions[i].libType, \
                               libOldVer: libVersions[i].libVersion, \
                               libNewVer: libInfo[j].libVersion })
-            break
+          break
+        if j == libInfo.length-1
+          # Found Deleted Library.
+          updateList.push({ libName: libVersions[i].libName, \
+                            libType: libVersions[i].libType, \
+                            libOldVer: libVersions[i].libVersion, \
+                            libNewVer: "DELETE"})
     
-    if libInfo.length > libVersions.length
-      # find new library type.
-      for i in [0...libInfo.length]
-        for j in [0...libVersions.length]
-          if libInfo[i].libType == libVersions[j].libType
-            break
-          if j == libVersions.length-1
-            updateList.push({ libName: libInfo[i].libName, \
-                              libType: libInfo[i].libType, \
-                              libOldVer: "NEW", \
-                              libNewVer: libInfo[i].libVersion })
+    for i in [0...libInfo.length]
+      for j in [0...libVersions.length]
+        if libInfo[i].libType == libVersions[j].libType
+          break
+        if j == libVersions.length-1
+          # Found new libraries
+          updateList.push({ libName: libInfo[i].libName, \
+                            libType: libInfo[i].libType, \
+                            libOldVer: "NEW", \
+                            libNewVer: libInfo[i].libVersion })
 
     if updateList.length > 0
       noti = atom.notifications.addInfo "New Update For Libraries!",
@@ -254,3 +260,4 @@ module.exports = Coxide =
     updateView = new UpdateView(updateList)
     updatePanel = atom.workspace.addModalPanel(item: updateView.element, visible: true)
     updateView.setPanel(updatePanel)
+    updateView.doUpdate()
