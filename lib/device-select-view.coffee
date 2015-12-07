@@ -84,11 +84,14 @@ class DeviceSelectView extends SelectListView
 
     try 
       jsonData = JSON.parse(fs.readFileSync(jsonFilePath).toString()) 
-      currentDevice = @_getDeviceByType(jsonData.args[0])
-      @populateList()
-      if currentDevice isnt null
-        @btnDevSelect.text currentDevice.libName
-      else  
+      if jsonData.args.length > 0
+        currentDevice = @_getDeviceByType(jsonData.args[0])
+        @populateList()
+        if currentDevice isnt null
+          @btnDevSelect.text currentDevice.libName
+        else  
+          @btnDevSelect.text 'Not support currently'
+      else
         @btnDevSelect.text 'Select Your Device'
     catch e
       alert 'Error : Invalid .atom-build.json file.'
