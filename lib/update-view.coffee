@@ -8,15 +8,19 @@ module.exports =
 class UpdateView extends View
   myPanel = null
   updateCount = null
+  updateList = null
   @content: (upList) ->
     @div class: 'coxide', =>
       @h1 class: 'font-size22', =>
         @text "Updating Libraries..."
-      @div outlet: 'updateListDiv', =>
+      @div class: 'font-size12', outlet: 'updateListDiv', =>
         for i in [0...upList.length]
           @h1 =>
             @span class: 'icon icon-plus'
-            @label outlet: 'libName'+i, upList[i].libName
+            if upList[i].libName.length > 18
+              @label outlet: 'libName'+i, upList[i].libName.substring(0, 18) + "..."
+            else
+              @label outlet: 'libName'+i, upList[i].libName
             @label outlet: 'libType'+i, class: 'hidden', upList[i].libType
             if upList[i].libOldVer == "NEW"
               @text "   [ New " 
@@ -36,6 +40,7 @@ class UpdateView extends View
       
   initialize: (upList) ->
     @updateCount = upList.length
+    @updateList = upList
     @btnUpdateClose.on 'click', => 
       if @myPanel isnt null
         @myPanel.hide()
@@ -56,9 +61,9 @@ class UpdateView extends View
     url = serverURL + '/lib-download/'
     
     for i in [0...@updateCount]
-      libName = this['libName'+i].text()
-      libType = this['libType'+i].text()
-      libNewVer = this['libNewVer'+i].text()
+      libName = @updateList[i].libName
+      libType = @updateList[i].libType
+      libNewVer = @updateList[i].libNewVer
       prog = this['prog'+i]
       filePath = installPath + "\\NOL.A\\cox-sdk\\"
       fileName = libType + ".zip"
