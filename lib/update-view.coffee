@@ -17,15 +17,15 @@ class UpdateView extends View
         for i in [0...upList.length]
           @h1 =>
             @span class: 'icon icon-plus'
-            if upList[i].libName.length > 18
-              @label outlet: 'libName'+i, upList[i].libName.substring(0, 18) + "..."
+            if upList[i].libName.length > 16
+              @label outlet: 'libName'+i, upList[i].libName.substring(0, 16) + "..."
             else
               @label outlet: 'libName'+i, upList[i].libName
             @label outlet: 'libType'+i, class: 'hidden', upList[i].libType
-            if upList[i].libOldVer == "NEW"
+            if upList[i].libOldVer is "NEW"
               @text "   [ New " 
               @label outlet: 'libNewVer'+i, upList[i].libNewVer
-            else if upList[i].libNewVer == "DELETE"
+            else if upList[i].libNewVer is "DELETE"
               @text "   [ Delete " 
               @label upList[i].libOldVer
               @label outlet: 'libNewVer'+i, ""
@@ -69,7 +69,7 @@ class UpdateView extends View
       fileName = libType + ".zip"
       
       do (url, prog, filePath, fileName, libName, libType, libNewVer) ->
-        if libNewVer is ""
+        if libNewVer is "DELETE"
           for j in [0...libVersions.length]
             if libVersions[j].libType == libType
               libVersions.splice(j,1)
@@ -100,11 +100,11 @@ class UpdateView extends View
               .pipe(unzip.Extract({ path: extractPath }));
             zipFile.on 'close', =>
               fs.unlink(filePath + fileName) 
-              for i in [0...libVersions.length]
-                if libVersions[i].libType == libType
-                  libVersions[i].libVersion = libNewVer
+              for j in [0...libVersions.length]
+                if libVersions[j].libType == libType
+                  libVersions[j].libVersion = libNewVer
                   break
-                if i == libVersions.length-1
+                if j == libVersions.length-1
                   libVersions.push({ libName: libName, \
                                      libType: libType, \
                                      libVersion: libNewVer })

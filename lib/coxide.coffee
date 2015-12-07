@@ -243,6 +243,17 @@ module.exports = Coxide =
                             libNewVer: libInfo[i].libVersion })
 
     if updateList.length > 0
+      updateInfoStr = ""
+      for i in [0...updateList.length]
+        if updateList[i].libOldVer is "NEW"
+          updateInfoStr = updateInfoStr + (i+1) + ". " + updateList[i].libName + \
+            " [ New " + updateList[i].libNewVer + " ]\n"
+        else if updateList[i].libNewVer is "DELETE"
+          updateInfoStr = updateInfoStr + (i+1) + ". " + updateList[i].libName + \
+            " [ Delete " + updateList[i].libOldVer + " ]\n"
+        else
+          updateInfoStr = updateInfoStr + (i+1) + ". " + updateList[i].libName + \
+            " [ " + updateList[i].libOldVer + " -> " + updateList[i].libNewVer + "]\n"
       noti = atom.notifications.addInfo "New Update For Libraries!",
           dismissable: true,
           buttons: [{
@@ -251,7 +262,8 @@ module.exports = Coxide =
             onDidClick: -> 
               noti.dismiss()
               Coxide.doUpdate(updateList)
-          }]
+          }],
+          detail : updateInfoStr
     else 
       if feedback == true
         atom.notifications.addInfo "You already have the latest version!"
