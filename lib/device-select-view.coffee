@@ -12,6 +12,7 @@ class DeviceSelectView extends SelectListView
     super
     @reloadDevList()
     @btnDevSelect = btnDevSel
+    @loadDevice()
     @addClass('grammar-selector')
     @list.addClass('mark-active')
 
@@ -75,7 +76,10 @@ class DeviceSelectView extends SelectListView
     return null
   
   loadDevice: ->
-    currentProjPath = atom.project.getPaths()[0]
+    if atom.project.getPaths()[0] is undefined
+      return
+
+    currentProjPath = atom.project.getPaths()[0]  
     jsonFilePath = currentProjPath + '\\.atom-build.json'
 
     try 

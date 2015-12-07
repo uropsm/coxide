@@ -24,6 +24,8 @@ module.exports = Coxide =
   activate: (state) ->
     installPath = atom.config.get('coxide.installPath')
     serverURL = atom.config.get('coxide.serverURL')
+    if atom.project.getPaths()[0] isnt undefined
+      projectPath = atom.project.getPaths()[0]
     
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-workspace', 
