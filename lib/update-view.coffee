@@ -58,7 +58,12 @@ class UpdateView extends View
     libVersions = atom.config.get('coxide.libVersions')
     installPath = atom.config.get('coxide.installPath')
     serverURL = atom.config.get('coxide.serverURL')
-    url = serverURL + '/lib-download/'
+    privateKey = atom.config.get('coxide.privateKey')
+    url = null
+    if typeof privateKey isnt 'undefined' and privateKey isnt ''
+      url = serverURL + '/lib-download/' + privateKey + '/'
+    else
+      url = serverURL + '/lib-download/'
     
     for i in [0...@updateCount]
       libName = @updateList[i].libName

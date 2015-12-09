@@ -1,4 +1,5 @@
 CreateProjectView = require './create-project-view'
+SetPrivateKeyView = require './set-private-key-view'
 UpdateView = require './update-view'
 TopToolbarView = require './top-toolbar-view'
 ToolbarButtonView = require './toolbar-button-view'
@@ -15,15 +16,22 @@ workspacePath = null
 projectPath = null
 projectName = null
 installPath = null
-  
+privateKey = null
+
 module.exports = Coxide =
   subscriptions: null
   modalPanel: null
   topToolbarView: null
+  privateKey: null
   
   activate: (state) ->
     installPath = atom.config.get('coxide.installPath')
     serverURL = atom.config.get('coxide.serverURL')
+    privateKey = atom.config.get('coxide.privateKey')
+    prvKeyUrl = ''
+    if typeof privateKey isnt 'undefined' and privateKey isnt ''
+      prvKeyUrl = '/'+privateKey
+
     if atom.project.getPaths()[0] isnt undefined
       projectPath = atom.project.getPaths()[0]
     
@@ -34,16 +42,22 @@ module.exports = Coxide =
                 'coxide:closeProject': => @closeProject(),
                 'coxide:viewVersion': => @viewVersion(),
                 'coxide:viewLicense': => @viewLicense(),
-                'coxide:libUpdate': => @libUpdate()
+                'coxide:libUpdate': => @libUpdate(),
+                'coxide:setPrivateKey': => @setPrivateKey()
                 
     createProjectView = new CreateProjectView
     @modalPanel = atom.workspace.addModalPanel(item: createProjectView.element, visible: false)
-  
+    
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
-    request serverURL + '/lib-latest-version', (error, response, body) ->
+    request serverURL + '/lib-latest-version' + prvKeyUrl, (error, response, body) ->
       if error is null
-        if body isnt "0"
-          Coxide.updateCheck(JSON.parse(body), false)
+        if body is "-1"
+          atom.notifications.addInfo "Can NOT connect to Update Server."
+        else if body is "-2"
+          atom.notifications.addInfo "Private key is NOT valid.",
+            detail : "Please reset or update on [Help] -> [Setting Private Key]"
+        else
+          Coxide.updateCheck(JSON.parse(body), true)
 
     btnWorkspacePath = createProjectView.getElementByName('btnWorkspacePath')  
     btnWorkspacePath.on 'click', =>  @selectWorkspacePath()
@@ -79,6 +93,9 @@ module.exports = Coxide =
   serialPort: ->
     spawn(installPath + '\\Nol.A\\serial_monitor\\nw.exe', [ '.' ], { })
 
+  setPrivateKey: ->
+    new SetPrivateKeyView
+    
   createProject: ->  
     if @modalPanel.isVisible() is false
       @modalPanel.show()
@@ -206,11 +223,20 @@ module.exports = Coxide =
 
   libUpdate: ->
     serverURL = atom.config.get('coxide.serverURL')
-    request serverURL + '/lib-latest-version', (error, response, body) ->
+    privateKey = atom.config.get('coxide.privateKey')
+    prvKeyUrl = ''
+    if typeof privateKey isnt 'undefined' and privateKey isnt ''
+      prvKeyUrl = '/'+privateKey
+    request serverURL + '/lib-latest-version' + prvKeyUrl, (error, response, body) ->
       if error is null
-        if body isnt "0"
+        if body is "-1"
+          atom.notifications.addInfo "Can NOT connect to Update Server."
+        else if body is "-2"
+          atom.notifications.addInfo "Private key is NOT valid.",
+            detail : "Please reset or update on [Help] -> [Setting Private Key]"
+        else
           Coxide.updateCheck(JSON.parse(body), true)
-
+          
   updateCheck: (libInfo, feedback) ->
     updateList = []
     libVersions = atom.config.get('coxide.libVersions')

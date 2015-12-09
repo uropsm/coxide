@@ -20,13 +20,19 @@
     'label': 'Help'
     'submenu': [
       {
+        'label': 'View License'
+        'command': 'coxide:viewLicense'
+      },
+      { type: 'separator' },
+      {
         'label': 'Update Libraries'
         'command': 'coxide:libUpdate'
       },
       {
-        'label': 'View License'
-        'command': 'coxide:viewLicense'
+        'label': 'Setting Private Key'
+        'command': 'coxide:setPrivateKey'
       },
+      { type: 'separator' },
       {
         'label': 'View Version Info.'
         'command': 'coxide:viewVersion'
