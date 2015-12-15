@@ -3,6 +3,8 @@ SetPrivateKeyView = require './set-private-key-view'
 UpdateView = require './update-view'
 TopToolbarView = require './top-toolbar-view'
 ToolbarButtonView = require './toolbar-button-view'
+utils = require './utils'
+
 {CompositeDisposable} = require 'atom'
 ipc = require 'ipc'
 fs = require 'fs-plus'
@@ -17,6 +19,7 @@ projectPath = null
 projectName = null
 installPath = null
 privateKey = null
+sep = null
 
 module.exports = Coxide =
   subscriptions: null
@@ -25,9 +28,12 @@ module.exports = Coxide =
   privateKey: null
   
   activate: (state) ->
-    installPath = atom.config.get('coxide.installPath')
     serverURL = atom.config.get('coxide.serverURL')
     privateKey = atom.config.get('coxide.privateKey')
+
+    installPath = utils.getInstallPath()
+    sep = utils.getSeperator()
+
     prvKeyUrl = ''
     if typeof privateKey isnt 'undefined' and privateKey isnt ''
       prvKeyUrl = '/'+privateKey
@@ -91,7 +97,7 @@ module.exports = Coxide =
   serialize: ->
 
   serialPort: ->
-    spawn(installPath + '\\Nol.A\\serial_monitor\\nw.exe', [ '.' ], { })
+    spawn(utils.getSerialMonitorPath(), [ '.' ], { })
 
   setPrivateKey: ->
     new SetPrivateKeyView
@@ -112,18 +118,18 @@ module.exports = Coxide =
       return
           
     if fs.existsSync(workspacePath) == true
-      if fs.existsSync(workspacePath + "\\" + projectName) == true
+      if fs.existsSync(workspacePath + sep + projectName) == true
         alert 'Same project already exists'
         return
         
       if @closeProject() is false
         return
         
-      projectPath = workspacePath + "\\" + projectName
+      projectPath = workspacePath + sep + projectName
       fs.makeTreeSync(projectPath)
-      fs.copySync(installPath + "\\Nol.A\\sample-proj\\config", projectPath)
-      if fs.existsSync(projectPath + "\\main.c") == false
-        fs.copySync(installPath + "\\Nol.A\\sample-proj\\template", projectPath)
+      fs.copySync(installPath + sep + "sample-proj" + sep + "config", projectPath)
+      if fs.existsSync(projectPath + sep + "main.cpp") == false
+        fs.copySync(installPath + sep + "sample-proj" + sep + "template", projectPath)
   
       atom.project.setPaths([projectPath])
       atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
@@ -136,7 +142,7 @@ module.exports = Coxide =
     ipc.on responseChannel, (path) ->
       ipc.removeAllListeners(responseChannel)
       if path isnt null
-        if fs.existsSync(path[0] + "\\.atom-build.json") == false
+        if fs.existsSync(path[0] + sep + ".atom-build.json") == false
           edtWorkspacePath = createProjectView.getElementByName('edtWorkspacePath') 
           edtWorkspacePath.getModel().setText(path[0])
         else
@@ -150,7 +156,7 @@ module.exports = Coxide =
       if path isnt null 
         if path[0] == projectPath
           alert 'This project is already opened.' 
-        else if fs.existsSync(path[0] + "\\.atom-build.json") == true
+        else if fs.existsSync(path[0] + sep + ".atom-build.json") == true
           if Coxide.closeProject() is false
             return
           atom.project.setPaths(path)
@@ -219,7 +225,7 @@ module.exports = Coxide =
         alert "Nol.A IDE version " + versionInfo.version + "\nCopyright 2015 CoXlab Inc. All rights reserved."
 
   viewLicense: ->
-    atom.workspace.open(installPath + "\\Nol.A\\Atom\\resources\\LICENSE.md")
+    atom.workspace.open(utils.getLicensePath())
 
   libUpdate: ->
     serverURL = atom.config.get('coxide.serverURL')
@@ -258,15 +264,22 @@ module.exports = Coxide =
                             libNewVer: "DELETE"})
     
     for i in [0...libInfo.length]
-      for j in [0...libVersions.length]
-        if libInfo[i].libType == libVersions[j].libType
-          break
-        if j == libVersions.length-1
-          # Found new libraries
-          updateList.push({ libName: libInfo[i].libName, \
-                            libType: libInfo[i].libType, \
-                            libOldVer: "NEW", \
-                            libNewVer: libInfo[i].libVersion })
+      if libVersions.length == 0
+        # Found new libraries
+        updateList.push({ libName: libInfo[i].libName, \
+                          libType: libInfo[i].libType, \
+                          libOldVer: "NEW", \
+                          libNewVer: libInfo[i].libVersion })
+      else      
+        for j in [0...libVersions.length]
+          if libInfo[i].libType == libVersions[j].libType
+            break
+          if j == libVersions.length-1
+            # Found new libraries
+            updateList.push({ libName: libInfo[i].libName, \
+                              libType: libInfo[i].libType, \
+                              libOldVer: "NEW", \
+                              libNewVer: libInfo[i].libVersion })
 
     if updateList.length > 0
       updateInfoStr = ""

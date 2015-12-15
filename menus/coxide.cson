@@ -6,6 +6,7 @@
         'label': 'Create Project'
         'command': 'coxide:createProject'
       },
+      { type: 'separator' },
       {
         'label': 'Open Project'
         'command': 'coxide:openProject'

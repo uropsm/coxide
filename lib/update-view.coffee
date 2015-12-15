@@ -3,6 +3,9 @@ request = require 'request'
 fs = require 'fs-plus'
 rmdir = require 'rimraf'
 unzip = require 'unzip'
+utils = require './utils'
+
+sep = null
 
 module.exports =
 class UpdateView extends View
@@ -39,6 +42,7 @@ class UpdateView extends View
       @button outlet: 'btnUpdateClose', class: 'btn btn-size15 pull-right', 'Close'
       
   initialize: (upList) ->
+    sep = utils.getSeperator()
     @updateCount = upList.length
     @updateList = upList
     @btnUpdateClose.on 'click', => 
@@ -56,7 +60,7 @@ class UpdateView extends View
   doUpdate: ->
     count = @updateCount
     libVersions = atom.config.get('coxide.libVersions')
-    installPath = atom.config.get('coxide.installPath')
+    installPath = utils.getInstallPath()
     serverURL = atom.config.get('coxide.serverURL')
     privateKey = atom.config.get('coxide.privateKey')
     url = null
@@ -70,7 +74,7 @@ class UpdateView extends View
       libType = @updateList[i].libType
       libNewVer = @updateList[i].libNewVer
       prog = this['prog'+i]
-      filePath = installPath + "\\NOL.A\\cox-sdk\\"
+      filePath = installPath + sep + "cox-sdk" + sep
       fileName = libType + ".zip"
       
       do (url, prog, filePath, fileName, libName, libType, libNewVer) ->
@@ -82,8 +86,7 @@ class UpdateView extends View
               count = count - 1
               if count == 0 
                 atom.config.set('coxide.libVersions', libVersions)
-                alert 'Update completed. IDE will be restarted automatically.'
-                atom.reload()
+                alert 'Update completed. Please restart Nol.A IDE!'
                 return
               break
         else
@@ -94,7 +97,7 @@ class UpdateView extends View
             extractPath = filePath
           else
             rmdir.sync filePath + libType
-          
+
           file = fs.createWriteStream(filePath + fileName)
           request.get url + libType 
             .pipe file
@@ -105,19 +108,22 @@ class UpdateView extends View
               .pipe(unzip.Extract({ path: extractPath }));
             zipFile.on 'close', =>
               fs.unlink(filePath + fileName) 
-              for j in [0...libVersions.length]
-                if libVersions[j].libType == libType
-                  libVersions[j].libVersion = libNewVer
-                  break
-                if j == libVersions.length-1
-                  libVersions.push({ libName: libName, \
-                                     libType: libType, \
-                                     libVersion: libNewVer })
+              if libVersions.length == 0
+                libVersions.push({ libName: libName, libType: libType, libVersion: libNewVer })
+              else
+                for j in [0...libVersions.length]
+                  if libVersions[j].libType == libType
+                    libVersions[j].libVersion = libNewVer
+                    break
+                  if j == libVersions.length-1
+                    libVersions.push({ libName: libName,libType: libType, libVersion: libNewVer })
               prog.val(100)
               
               # count '0' means all is done.
               count = count - 1
               if count == 0 
                 atom.config.set('coxide.libVersions', libVersions)
-                alert 'Update completed. IDE will be restarted automatically.'
-                atom.reload()
+                alert 'Update completed. Please restart Nol.A IDE!'
+
+
+

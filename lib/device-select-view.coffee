@@ -1,8 +1,10 @@
 {SelectListView} = require 'atom-space-pen-views'
 fs = require 'fs-plus'
+utils = require './utils'
 
 currentDevice = null
 deviceList = []           
+sep = null
 
 module.exports =
 class DeviceSelectView extends SelectListView  
@@ -10,6 +12,7 @@ class DeviceSelectView extends SelectListView
   
   initialize: (btnDevSel) ->
     super
+    sep = utils.getSeperator()
     @reloadDevList()
     @btnDevSelect = btnDevSel
     @loadDevice()
@@ -49,7 +52,7 @@ class DeviceSelectView extends SelectListView
 
   writeDevModel: (device) ->
     currentProjPath = atom.project.getPaths()[0]
-    jsonFilePath = currentProjPath + '\\.atom-build.json'
+    jsonFilePath = currentProjPath + sep + '.atom-build.json'
     if fs.isFileSync(jsonFilePath) is false 
       alert 'Error : The current project doesn\'t have .atom-build.json file'
       return false
@@ -80,7 +83,7 @@ class DeviceSelectView extends SelectListView
       return
 
     currentProjPath = atom.project.getPaths()[0]  
-    jsonFilePath = currentProjPath + '\\.atom-build.json'
+    jsonFilePath = currentProjPath + sep + '.atom-build.json'
 
     try 
       jsonData = JSON.parse(fs.readFileSync(jsonFilePath).toString()) 
