@@ -21,7 +21,7 @@ exports.getInstallPath = ->
 
 exports.getSeperator = ->
   platform = os.platform()
-  if platform is "linux" or platform is "osx"
+  if platform is "linux" or platform is "darwin"
     return "/"
   else if platform is "win32" or platform is "win64"
     return "\\"
@@ -32,7 +32,7 @@ exports.getLicensePath = ->
   licensePath = ""
 
   platform = os.platform()
-  if platform == "linux" || platform == "osx"
+  if platform == "linux" || platform == "darwin"
     licensePath = sep + "share" + sep + "atom" + sep + "resources" + sep + "LICENSE.md"
   else if platform == "win32" || platform == "win64"
     licensePath = sep + "Atom" + sep + "resources" + sep + "LICENSE.md"
@@ -45,7 +45,7 @@ exports.getSerialMonitorPath = ->
   serialMonitorPath = ""
 
   platform = os.platform()
-  if platform == "linux" || platform == "osx"
+  if platform == "linux" || platform == "darwin"
     serialMonitorPath = sep + "serial_monitor" + sep + "nw"
   else if platform == "win32" || platform == "win64"
     serialMonitorPath = sep + "serial_monitor" + sep + "nw.exe"
