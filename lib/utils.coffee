@@ -1,4 +1,4 @@
-utils = require './utils.coffee'
+utils = require './utils'
 remote = require 'remote'
 app = remote.require('app')
 os = require 'os'
