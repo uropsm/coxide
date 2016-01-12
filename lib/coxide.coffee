@@ -12,6 +12,7 @@ fs = require 'fs-plus'
 {View} = require 'space-pen'
 {SelectListView} = require 'atom-space-pen-views'
 request = require 'request'
+rmdir = require 'rimraf'
 
 createProjectView = null
 workspacePath = null
@@ -66,6 +67,8 @@ module.exports = Coxide =
         else
           Coxide.updateCheck(JSON.parse(body), true)
 
+    @checkNotUsedToolchain()
+          
     btnWorkspacePath = createProjectView.getElementByName('btnWorkspacePath')  
     btnWorkspacePath.on 'click', =>  @selectWorkspacePath()
     btnDoCreateProj = createProjectView.getElementByName('btnDoCreateProj')  
@@ -258,14 +261,15 @@ module.exports = Coxide =
             updateList.push({ libName: libVersions[i].libName, \
                               libType: libVersions[i].libType, \
                               libOldVer: libVersions[i].libVersion, \
-                              libNewVer: libInfo[j].libVersion })
+                              libNewVer: libInfo[j].libVersion, \
+                              libToolchain : libInfo[i].libToolchain })
           break
         if j == libInfo.length-1
           # Found Deleted Library.
           updateList.push({ libName: libVersions[i].libName, \
                             libType: libVersions[i].libType, \
                             libOldVer: libVersions[i].libVersion, \
-                            libNewVer: "DELETE"})
+                            libNewVer: "DELETE" })
     
     for i in [0...libInfo.length]
       if libVersions.length == 0
@@ -273,7 +277,8 @@ module.exports = Coxide =
         updateList.push({ libName: libInfo[i].libName, \
                           libType: libInfo[i].libType, \
                           libOldVer: "NEW", \
-                          libNewVer: libInfo[i].libVersion })
+                          libNewVer: libInfo[i].libVersion, \
+                          libToolchain : libInfo[i].libToolchain })
       else      
         for j in [0...libVersions.length]
           if libInfo[i].libType == libVersions[j].libType
@@ -283,7 +288,8 @@ module.exports = Coxide =
             updateList.push({ libName: libInfo[i].libName, \
                               libType: libInfo[i].libType, \
                               libOldVer: "NEW", \
-                              libNewVer: libInfo[i].libVersion })
+                              libNewVer: libInfo[i].libVersion,
+                              libToolchain : libInfo[i].libToolchain })
 
     if updateList.length > 0
       updateInfoStr = ""
@@ -316,3 +322,31 @@ module.exports = Coxide =
     updatePanel = atom.workspace.addModalPanel(item: updateView.element, visible: true)
     updateView.setPanel(updatePanel)
     updateView.doUpdate()
+    
+  checkNotUsedToolchain: ->
+    # Check not-used-toolchain and remove them. 
+    installedTools = atom.config.get('coxide.toolchains')
+    libVersions = atom.config.get('coxide.libVersions')
+    deleteList = []
+    for i in [0...installedTools.length]
+      found = 0
+      for j in [0...libVersions.length]
+        if libVersions[j].libToolchain == installedTools[i]
+          found = 1
+      if found == 0
+        deleteList.push(installedTools[i])
+    if deleteList.length > 0
+      noti = atom.notifications.addInfo "Unused toolchains have been deleted in background.",
+        dismissable: true
+      instPath = utils.getInstallPath()
+      spr = utils.getSeperator()
+      toolPath = installPath + spr + "cox-sdk" + spr + "tools" + spr
+      for i in [0...deleteList.length]
+        rmdir.sync toolPath + deleteList[i]
+        idx = installedTools.indexOf(deleteList[i]);
+        installedTools.splice(idx, 1);
+      atom.config.set('coxide.toolchains', installedTools)
+      
+      
+    
+    

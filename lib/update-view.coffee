@@ -73,11 +73,14 @@ class UpdateView extends View
       libName = @updateList[i].libName
       libType = @updateList[i].libType
       libNewVer = @updateList[i].libNewVer
+      libToolchain = null
+      if typeof @updateList[i].libToolchain isnt 'undefined'  
+        libToolchain = @updateList[i].libToolchain
       prog = this['prog'+i]
       filePath = installPath + sep + "cox-sdk" + sep
       fileName = libType + ".zip"
       
-      do (url, prog, filePath, fileName, libName, libType, libNewVer) ->
+      do (url, prog, filePath, fileName, libName, libType, libNewVer, libToolchain) ->
         if libNewVer is "DELETE"
           for j in [0...libVersions.length]
             if libVersions[j].libType == libType
@@ -109,14 +112,16 @@ class UpdateView extends View
             zipFile.on 'close', =>
               fs.unlink(filePath + fileName) 
               if libVersions.length == 0
-                libVersions.push({ libName: libName, libType: libType, libVersion: libNewVer })
+                libVersions.push({ libName: libName, libType: libType, \
+                                   libVersion: libNewVer, libToolchain: libToolchain })
               else
                 for j in [0...libVersions.length]
                   if libVersions[j].libType == libType
                     libVersions[j].libVersion = libNewVer
                     break
                   if j == libVersions.length-1
-                    libVersions.push({ libName: libName,libType: libType, libVersion: libNewVer })
+                    libVersions.push({ libName: libName,libType: libType, \
+                                       libVersion: libNewVer, libToolchain: libToolchain })
               prog.val(100)
               
               # count '0' means all is done.

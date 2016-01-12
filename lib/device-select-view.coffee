@@ -1,6 +1,9 @@
 {SelectListView} = require 'atom-space-pen-views'
+{CompositeDisposable} = require 'atom'
 fs = require 'fs-plus'
 utils = require './utils'
+
+ToolchainDownloadView = require './toolchain-download-view'
 
 currentDevice = null
 deviceList = []           
@@ -12,6 +15,10 @@ class DeviceSelectView extends SelectListView
   
   initialize: (btnDevSel) ->
     super
+    subscriptions = new CompositeDisposable
+    subscriptions.add atom.commands.add 'atom-workspace', 
+                    'coxide:checkToolchain': => @checkToolchain()
+    
     sep = utils.getSeperator()
     @reloadDevList()
     @btnDevSelect = btnDevSel
@@ -44,7 +51,7 @@ class DeviceSelectView extends SelectListView
     @cancel()
     
   reloadDevList: ->
-    deviceList = atom.config.get('coxide.libVersions')   
+    deviceList = atom.config.get('coxide.libVersions')
     for i in [0...deviceList.length]
       if deviceList[i].libType == "builder"
         deviceList.splice(i, 1)
@@ -56,16 +63,19 @@ class DeviceSelectView extends SelectListView
     if fs.isFileSync(jsonFilePath) is false 
       alert 'Error : The current project doesn\'t have .atom-build.json file'
       return false
-      
+
     try 
       jsonData = JSON.parse(fs.readFileSync(jsonFilePath).toString())
-      jsonData.args = [ device.libType ]
+      jsonData.args = [ device.libType, device.libToolchain ]
       fs.writeFileSync(jsonFilePath, JSON.stringify(jsonData, null, ' '))
-      return true
     catch e
       alert 'Error : Invalid .atom-build.json file.'
       return false
-  
+      
+    if @_checkToolchain(device.libType) is false
+      @_notiDownloadToolchain(device.libName, device.libToolchain, @_doDownloadToolchain)
+    return true
+    
   _getDeviceByName: (name) ->
     for dev in deviceList
       if name == dev.libName
@@ -92,18 +102,55 @@ class DeviceSelectView extends SelectListView
         @populateList()
         if currentDevice isnt null
           @btnDevSelect.text currentDevice.libName
+          if @_checkToolchain(currentDevice.libType) is false
+            @_notiDownloadToolchain(currentDevice.libName, currentDevice.libToolchain, @_doDownloadToolchain)
         else  
           @btnDevSelect.text 'Not support currently'
       else
         @btnDevSelect.text 'Select Your Device'
     catch e
       alert 'Error : Invalid .atom-build.json file.'
-    
+
   clearDevice: ->
     currentDevice = null
     @populateList()
     @btnDevSelect.text 'Select Your Device'
-        
+  
+  # Check if currnetLibType has an installed toolchain.
+  _checkToolchain: (currentLibType) ->
+    targetToolChain = null
+    toolChainList = atom.config.get('coxide.toolchains')
+    for i in [0...deviceList.length]
+      if deviceList[i].libType == currentLibType
+        targetToolChain = deviceList[i].libToolchain
+        break
+    for i in [0...toolChainList.length]
+      if toolChainList[i] == targetToolChain
+        return true
+    return false
+
+  # This function is requested from build module.
+  checkToolchain: ->
+    if @_checkToolchain(currentDevice.libType) is false
+      @_notiDownloadToolchain(currentDevice.libName, currentDevice.libToolchain, @_doDownloadToolchain)
+  
+  _notiDownloadToolchain: (libName, libToolchain, doDownload) ->
+    noti = atom.notifications.addInfo "["+libName+"] Toolchain download is required!",
+              dismissable: true,
+              buttons: [{
+                text: 'Download'
+                className: 'btn-downloadDo'
+                onDidClick: -> 
+                  noti.dismiss()
+                  doDownload(libToolchain)
+              }]
+  
+  _doDownloadToolchain: (libToolchain) ->
+    toolchainDownloadView = new ToolchainDownloadView(libToolchain)
+    downloadPanel = atom.workspace.addModalPanel(item: toolchainDownloadView.element, visible: true)
+    toolchainDownloadView.setPanel(downloadPanel)
+    toolchainDownloadView.doDownload()
+  
   attach: ->
     @storeFocusedElement()
     @panel ?= atom.workspace.addModalPanel(item: this)

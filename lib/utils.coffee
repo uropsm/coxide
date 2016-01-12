@@ -52,6 +52,11 @@ exports.getSerialMonitorPath = ->
   
   return installPath + serialMonitorPath
 
+exports.getPlatform = ->
+  platform = os.platform()
+  if platform == "win32" || platform == "win64"
+    platform = "window"
+  return platform
 
 
 
