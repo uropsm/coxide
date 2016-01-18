@@ -3,6 +3,7 @@ request = require 'request'
 fs = require 'fs-plus'
 rmdir = require 'rimraf'
 unzip = require 'unzip'
+wrench = require 'wrench'
 utils = require './utils'
 
 sep = null
@@ -114,6 +115,8 @@ class ToolchainDownloadView extends View
 
         @zipFile.on 'close', =>
           fs.unlink(filePath + fileName)
+          if platform == 'linux' || platform == 'darwin'
+            wrench.chmodSyncRecursive(filePath+@targetToolchain, 0o755)
           clearInterval(seq)
           @progBar.val(100)
           @lbPercent.text('100%')

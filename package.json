@@ -15,8 +15,8 @@
     "fs-plus": "^2.8.0",
     "request": "2.63.0",
     "unzip": "0.1.11",
-    "unzip2": "0.2.5",
-    "rimraf": "2.4.3"
+    "rimraf": "2.4.3",
+    "wrench": "1.5.8"
   },
   "packagDependencies": {}
 }
