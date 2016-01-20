@@ -9,9 +9,12 @@ exports.getInstallPath = ->
   appPath = app.getAppPath()
 
   platform = os.platform()
-  if platform == "linux" || platform == "darwin"
+  if platform == "linux"
     sep = "/"
     uselessPath = sep + "share" + sep + "atom" + sep + "resources" + sep + "app.asar"
+  else if platform == "darwin"
+    sep = "/"
+    uselessPath = sep + "Contents" + sep +  "Resources" + sep + "app.asar"
   else if platform == "win32" || platform == "win64"
     sep = "\\"
     uselessPath = sep + "Atom" + sep + "resources" + sep + "app.asar"
@@ -32,8 +35,10 @@ exports.getLicensePath = ->
   licensePath = ""
 
   platform = os.platform()
-  if platform == "linux" || platform == "darwin"
+  if platform == "linux"
     licensePath = sep + "share" + sep + "atom" + sep + "resources" + sep + "LICENSE.md"
+  else if platform == "darwin"
+    licensePath = sep + "Contents" + sep + "Resources" + sep + "LICENSE.md"
   else if platform == "win32" || platform == "win64"
     licensePath = sep + "Atom" + sep + "resources" + sep + "LICENSE.md"
   
