@@ -101,7 +101,8 @@ module.exports = Coxide =
   serialize: ->
 
   serialPort: ->
-    spawn(utils.getSerialMonitorPath(), [ '.' ], { })
+    alert "Not available now."
+    # spawn(utils.getSerialMonitorPath(), [ '.' ], { })
 
   setPrivateKey: ->
     new SetPrivateKeyView
