@@ -3,6 +3,7 @@ request = require 'request'
 fs = require 'fs-plus'
 rmdir = require 'rimraf'
 unzip = require 'unzip'
+wrench = require 'wrench'
 utils = require './utils'
 
 sep = null
@@ -110,7 +111,9 @@ class UpdateView extends View
             zipFile = fs.createReadStream(filePath + fileName)
               .pipe(unzip.Extract({ path: extractPath }));
             zipFile.on 'close', =>
-              fs.unlink(filePath + fileName) 
+              fs.unlink(filePath + fileName)
+              if libType == "builder" && (platform == 'linux' || platform == 'darwin')
+                wrench.chmodSyncRecursive(filePath+"make", 0o755)
               if libVersions.length == 0
                 libVersions.push({ libName: libName, libType: libType, \
                                    libVersion: libNewVer, libToolchain: libToolchain })
