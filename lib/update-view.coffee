@@ -112,6 +112,7 @@ class UpdateView extends View
               .pipe(unzip.Extract({ path: extractPath }));
             zipFile.on 'close', =>
               fs.unlink(filePath + fileName)
+              platform = utils.getPlatform()
               if libType == "builder" && (platform == 'linux' || platform == 'darwin')
                 wrench.chmodSyncRecursive(filePath+"make", 0o755)
               if libVersions.length == 0
