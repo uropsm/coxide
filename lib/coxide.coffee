@@ -263,7 +263,7 @@ module.exports = Coxide =
                               libType: libVersions[i].libType, \
                               libOldVer: libVersions[i].libVersion, \
                               libNewVer: libInfo[j].libVersion, \
-                              libToolchain : libInfo[i].libToolchain })
+                              libToolchain : libInfo[j].libToolchain })
           break
         if j == libInfo.length-1
           # Found Deleted Library.
