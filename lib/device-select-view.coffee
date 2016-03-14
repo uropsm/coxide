@@ -66,7 +66,7 @@ class DeviceSelectView extends SelectListView
 
     try 
       jsonData = JSON.parse(fs.readFileSync(jsonFilePath).toString())
-      jsonData.args = [ device.libType, device.libToolchain ]
+      jsonData.args = [ device.libType ]
       fs.writeFileSync(jsonFilePath, JSON.stringify(jsonData, null, ' '))
     catch e
       alert 'Error : Invalid .atom-build.json file.'
@@ -99,6 +99,7 @@ class DeviceSelectView extends SelectListView
       jsonData = JSON.parse(fs.readFileSync(jsonFilePath).toString()) 
       if jsonData.args.length > 0
         currentDevice = @_getDeviceByType(jsonData.args[0])
+        currentDevice.libToolchain = @_whatToolchain(currentDevice.libType)
         @populateList()
         if currentDevice isnt null
           @btnDevSelect.text currentDevice.libName
@@ -116,14 +117,16 @@ class DeviceSelectView extends SelectListView
     @populateList()
     @btnDevSelect.text 'Select Your Device'
   
+  _whatToolchain: (libType) ->
+    libVersions = atom.config.get('coxide.libVersions')
+    for i in [0...libVersions.length]
+      if libVersions[i].libType == libType
+        return libVersions[i].libToolchain
+    
   # Check if currnetLibType has an installed toolchain.
   _checkToolchain: (currentLibType) ->
-    targetToolChain = null
+    targetToolChain = @_whatToolchain(currentLibType)
     toolChainList = atom.config.get('coxide.toolchains')
-    for i in [0...deviceList.length]
-      if deviceList[i].libType == currentLibType
-        targetToolChain = deviceList[i].libToolchain
-        break
     for i in [0...toolChainList.length]
       if toolChainList[i] == targetToolChain
         return true

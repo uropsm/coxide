@@ -122,6 +122,7 @@ class UpdateView extends View
                 for j in [0...libVersions.length]
                   if libVersions[j].libType == libType
                     libVersions[j].libVersion = libNewVer
+                    libVersions[j].libToolchain = libToolchain
                     break
                   if j == libVersions.length-1
                     libVersions.push({ libName: libName,libType: libType, \

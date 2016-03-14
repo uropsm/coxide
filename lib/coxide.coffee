@@ -273,8 +273,8 @@ module.exports = Coxide =
                             libNewVer: "DELETE" })
     
     for i in [0...libInfo.length]
+      # Found new libraries
       if libVersions.length == 0
-        # Found new libraries
         updateList.push({ libName: libInfo[i].libName, \
                           libType: libInfo[i].libType, \
                           libOldVer: "NEW", \
