@@ -50,8 +50,7 @@ module.exports = Coxide =
                 'coxide:viewVersion': => @viewVersion(),
                 'coxide:viewLicense': => @viewLicense(),
                 'coxide:libUpdate': => @libUpdate(),
-                'coxide:setPrivateKey': => @setPrivateKey(),
-                'coxide:build': => @buildByKey()
+                'coxide:setPrivateKey': => @setPrivateKey()
                 
     createProjectView = new CreateProjectView
     @modalPanel = atom.workspace.addModalPanel(item: createProjectView.element, visible: false)
@@ -106,9 +105,6 @@ module.exports = Coxide =
 
   setPrivateKey: ->
     new SetPrivateKeyView
-  
-  buildByKey: ->
-    atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:trigger')
 
   createProject: ->  
     if @modalPanel.isVisible() is false
