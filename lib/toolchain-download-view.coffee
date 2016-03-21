@@ -131,4 +131,3 @@ class ToolchainDownloadView extends View
       
     file.on 'error', =>
       alert 'Download has been failed. Please retry again.'
-

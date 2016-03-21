@@ -62,8 +62,3 @@ exports.getPlatform = ->
   if platform == "win32" || platform == "win64"
     platform = "window"
   return platform
-
-
-
-
-

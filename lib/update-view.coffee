@@ -6,10 +6,9 @@ unzip = require 'unzip'
 wrench = require 'wrench'
 utils = require './utils'
 
-sep = null
-
 module.exports =
 class UpdateView extends View
+  sep = null
   myPanel = null
   updateCount = null
   updateList = null
@@ -43,14 +42,12 @@ class UpdateView extends View
       @button outlet: 'btnUpdateClose', class: 'btn btn-size15 pull-right', 'Close'
       
   initialize: (upList) ->
-    sep = utils.getSeperator()
+    @sep = utils.getSeperator()
     @updateCount = upList.length
     @updateList = upList
     @btnUpdateClose.on 'click', => 
       if @myPanel isnt null
         @myPanel.hide()
-
-  serialize: ->
 
   destroy: ->
     @element.remove()
@@ -60,8 +57,8 @@ class UpdateView extends View
 
   doUpdate: ->
     count = @updateCount
-    libVersions = atom.config.get('coxide.libVersions')
     installPath = utils.getInstallPath()
+    libVersions = atom.config.get('coxide.libVersions')
     serverURL = atom.config.get('coxide.serverURL')
     privateKey = atom.config.get('coxide.privateKey')
     url = null
@@ -73,12 +70,10 @@ class UpdateView extends View
     for i in [0...@updateCount]
       libName = @updateList[i].libName
       libType = @updateList[i].libType
-      libNewVer = @updateList[i].libNewVer
-      libToolchain = null
-      if typeof @updateList[i].libToolchain isnt 'undefined'  
-        libToolchain = @updateList[i].libToolchain
+      libNewVer = @updateList[i].libNewVer 
+      libToolchain = @updateList[i].libToolchain
       prog = this['prog'+i]
-      filePath = installPath + sep + "cox-sdk" + sep
+      filePath = installPath + @sep + "cox-sdk" + @sep
       fileName = libType + ".zip"
       
       do (url, prog, filePath, fileName, libName, libType, libNewVer, libToolchain) ->
@@ -86,8 +81,9 @@ class UpdateView extends View
           for j in [0...libVersions.length]
             if libVersions[j].libType == libType
               libVersions.splice(j,1)
+              rmdir.sync filePath + libType
               prog.val(100)
-              count = count - 1
+              count--
               if count == 0 
                 atom.config.set('coxide.libVersions', libVersions)
                 alert 'Update completed. Please restart Nol.A IDE!'
@@ -128,12 +124,8 @@ class UpdateView extends View
                     libVersions.push({ libName: libName,libType: libType, \
                                        libVersion: libNewVer, libToolchain: libToolchain })
               prog.val(100)
-              
               # count '0' means all is done.
-              count = count - 1
+              count--
               if count == 0 
                 atom.config.set('coxide.libVersions', libVersions)
                 alert 'Update completed. Please restart Nol.A IDE!'
-
-
-

@@ -1,8 +1,16 @@
 {View} = require 'space-pen'
 {TextEditorView} = require 'atom-space-pen-views'
+ipc = require 'ipc'
+fs = require 'fs-plus'
+
+utils = require './utils'
 
 module.exports =
 class CreateProjectView extends View 
+  coxide = null
+  modalPanel = null
+  sep = null
+  
   @content: ->
     @div class: 'coxide', =>
       @h1 class: 'icon icon-plus', =>
@@ -20,25 +28,59 @@ class CreateProjectView extends View
       @div class: 'coxide-align-center', =>
         @button outlet: 'btnDoCreateProj', class: 'btn btn-size15 icon icon-flame', 'Done'
       
-  initialize: () ->
+  initialize: (p) ->
+    @coxide = p
+    @modalPanel = atom.workspace.addModalPanel(item: @element, visible: false)
+    @btnWorkspacePath.on 'click', => @selectWorkspacePath()
+    @btnDoCreateProj.on 'click', => @doCreateProj()
+    @btnCancel.on 'click', =>  @modalPanel.hide()
+    @sep = utils.getSeperator()
+    @installPath = utils.getInstallPath()
     
-  # Returns an object that can be retrieved when package is activated
-  serialize: ->
-
-  # Tear down any state and detach
+  doShow: ->
+    if @modalPanel.isVisible() is false
+      @modalPanel.show()
+  
   destroy: ->
     @element.remove()
+  
+  selectWorkspacePath: ->
+    responseChannel = "atom-create-project-response"
+    ipc.on responseChannel, (path) =>
+      ipc.removeAllListeners(responseChannel)
+      if path isnt null
+        if fs.existsSync(path[0] + @sep + ".atom-build.json") == false
+          @edtWorkspacePath.setText(path[0])
+        else
+          alert('The selected path is including a project. Please select another path for workspace.');
+    ipc.send('create-project', responseChannel)
+
+  doCreateProj:  ->
+    workspacePath = @edtWorkspacePath.getText()
+    projectName = @edtProjName.getText()
     
-  getElementByName: (name) ->
-    if(name is 'btnCancel')
-      return @btnCancel
-    else if(name is 'edtProjName')
-      return @edtProjName
-    else if(name is 'edtWorkspacePath')
-      return @edtWorkspacePath
-    else if(name is 'btnWorkspacePath')
-      return @btnWorkspacePath
-    else if(name is 'btnDoCreateProj')
-      return @btnDoCreateProj
+    if projectName == ""
+      alert 'Invalid Project Name.'
+      return
+
+    if fs.existsSync(workspacePath) == true
+      if fs.existsSync(workspacePath + @sep + projectName) == true
+        alert 'Same project already exists'
+        return
+
+      # check for currently opened project.
+      if @coxide.closeProject() is false
+        return
+        
+      projectPath = workspacePath + @sep + projectName
+      fs.makeTreeSync(projectPath)
+      fs.copySync(@installPath + @sep + "sample-proj" + @sep + "config", projectPath)
+      if fs.existsSync(projectPath + @sep + "main.cpp") == false
+        fs.copySync(@installPath + @sep + "sample-proj" + @sep + "template", projectPath)
+
+      @coxide.projectPath = projectPath
+      @modalPanel.hide()
+      atom.project.setPaths([projectPath])
+      atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
     else
-      return null
+      alert 'Invalid Workspace Path.'

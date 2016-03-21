@@ -1,6 +1,7 @@
 {CompositeDisposable} = require 'atom'
 {View} = require 'space-pen'
 DeviceSelectView = require './device-select-view'
+ToolbarButtonView = require './toolbar-button-view'
 
 module.exports = class TopToolbarView extends View
   devSelectView: null
@@ -12,18 +13,21 @@ module.exports = class TopToolbarView extends View
   items: []
 
   initialize: ->
+    atom.workspace.addTopPanel item: @
     @devSelectView = new DeviceSelectView(@btnDevSelect)
     @addClass "tool-bar-24px"
     @btnDevSelect.on "click", => @showDevSelectView()
+
+    guideOpt = { tooltip: "Guide", icon: "book", callback: @guideLink }
+    guideBtn = new ToolbarButtonView(guideOpt)
+    @addItem(guideBtn)
+    
+    serialOpt = { tooltip: "Serial Port", icon: "checklist", callback: @serialPort }
+    serialBtn = new ToolbarButtonView(serialOpt)
+    @addItem(serialBtn)
     
   destroy: ->
   
-  showDevSelectView: ->
-    if atom.project.getPaths()[0] is undefined
-      alert "Please open or create a project"
-    else
-      @devSelectView.toggle()
-
   addItem: (newItem) ->
     nextItem = null
     for existingItem, index in @items
@@ -34,9 +38,22 @@ module.exports = class TopToolbarView extends View
     nextElement = atom.views.getView nextItem
     @.element.insertBefore newElement, nextElement
     nextItem
+
+  serialPort: ->
+    alert "Not available now."
+
+  guideLink: ->
+    shell = require 'shell'
+    shell.openExternal('http://www.coxlab.kr/index.php/docs/')
     
   loadTargetDevice: ->
     @devSelectView.loadDevice()
 
   clearTargetDevice: ->
     @devSelectView.clearDevice()
+
+  showDevSelectView: ->
+    if atom.project.getPaths()[0] is undefined
+      alert "Please open or create a project"
+    else
+      @devSelectView.toggle()

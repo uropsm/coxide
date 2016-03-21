@@ -25,20 +25,16 @@ class SetPrivateView extends View
     @modalPanel = atom.workspace.addModalPanel(item: @element, visible: true)
     @privateKey = atom.config.get('coxide.privateKey')
     if typeof @privateKey isnt 'undefined' and @privateKey isnt ''
-      @edtPrvKey.getModel().setText(@privateKey)
+      @edtPrvKey.setText(@privateKey)
     @btnCancel.on 'click', =>  @modalPanel.hide()
     @btnReset.on 'click', => @resetPrivateKey()
     @btnSave.on 'click', => @savePrivateKey()
-
-  # Returns an object that can be retrieved when package is activated
-  serialize: ->
-
-  # Tear down any state and detach
+  
   destroy: ->
     @element.remove()
     
   savePrivateKey: ->
-    prvKey = @edtPrvKey.getModel().getText()
+    prvKey = @edtPrvKey.getText()
     if prvKey is ""  
       alert 'Empty Private Key!'
     else if prvKey.length != 16  
@@ -48,7 +44,7 @@ class SetPrivateView extends View
       request serverURL + '/lib-latest-version/' + prvKey, (error, response, body) ->
         if error is null
           if body is "-1"
-            alert "Can NOT connect to Update Server."
+            alert "Server Error. Please retry later."
           else if body is "-2"
             alert "Invalid Private Key. Please check again."
           else
@@ -58,5 +54,5 @@ class SetPrivateView extends View
   resetPrivateKey: ->
     atom.config.set('coxide.privateKey', "")
     alert 'Private Key has been reset!'
-    @edtPrvKey.getModel().setText("")
+    @edtPrvKey.setText("")
 
