@@ -49,6 +49,7 @@ module.exports = Coxide =
     @createProjectView = new CreateProjectView(@)
     @topToolbarView = new TopToolbarView()
   
+    @ideUpdate()
     @libUpdate()
     @checkNotUsedToolchain()
 
@@ -122,12 +123,32 @@ module.exports = Coxide =
             item.destroy()
 
   viewVersion: ->
-    for versionInfo in atom.packages.getAvailablePackageMetadata()
-      if versionInfo.name == "coxide"
-        alert "Nol.A IDE version " + versionInfo.version + "\nCopyright 2016 CoXlab Inc. All rights reserved."
+    alert "Nol.A IDE version " + @_getIdeVersion() + "\nCopyright 2016 CoXlab Inc. All rights reserved."
 
   viewLicense: ->
     atom.workspace.open(utils.getLicensePath())
+
+  _getIdeVersion: ->
+    for versionInfo in atom.packages.getAvailablePackageMetadata()
+      if versionInfo.name == "coxide"
+        return versionInfo.version
+    return "unknown"
+    
+  ideUpdate: ->
+    serverURL = atom.config.get('coxide.serverURL')
+    request serverURL + '/get-ide-info', (error, response, body) =>
+      if error is null
+        ideInfo = JSON.parse(body)
+        if ideInfo.version isnt @_getIdeVersion()
+          noti = atom.notifications.addSuccess "New IDE version [" +ideInfo.version+"] Release",
+          dismissable: true,
+          buttons: [{ 
+            text: 'Go to Download',
+            onDidClick: => 
+              noti.dismiss()
+              shell = require 'shell'
+              shell.openExternal('http://www.coxlab.kr/docs/nol-a-ide-install-guide')
+          }]
 
   libUpdate: ->
     serverURL = atom.config.get('coxide.serverURL')
@@ -170,7 +191,7 @@ module.exports = Coxide =
           detail : updateInfoStr
     else 
       if feedback == true
-        atom.notifications.addInfo "You already have the latest version!"
+        atom.notifications.addInfo "You already have the latest Libraries!"
 
   _makeUpdateList: (libInfo) ->
     libVers = atom.config.get('coxide.libVersions')
