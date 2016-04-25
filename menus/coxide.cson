@@ -14,6 +14,15 @@
       {
         'label': 'Close Project'
         'command': 'coxide:closeProject'
+      },
+      { type: 'separator' },
+      {
+        'label': 'Build Project [F7]'
+        'command': 'coxide:buildProject'
+      },
+      {
+        'label': 'Clean Project'
+        'command': 'coxide:cleanProject'
       }
     ]
   },

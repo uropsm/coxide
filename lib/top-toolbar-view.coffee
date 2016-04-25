@@ -1,15 +1,17 @@
 {CompositeDisposable} = require 'atom'
 {View} = require 'space-pen'
 DeviceSelectView = require './device-select-view'
+PortSelectView = require './port-select-view'
 ToolbarButtonView = require './toolbar-button-view'
 
 module.exports = class TopToolbarView extends View
   devSelectView: null
+  portSelectView: null
   
   @content: ->
     @div class: 'coxide coxide-tool-bar', =>
       @button outlet: 'btnDevSelect', class: 'pull-right btn btn-default tool-bar-long-btn icon icon-check', 'Select Your Device'
-      
+      @button outlet: 'btnPortSelect', class: 'pull-right btn btn-default tool-bar-long-btn icon icon-check', 'JTAG'
   items: []
 
   initialize: ->
@@ -17,6 +19,10 @@ module.exports = class TopToolbarView extends View
     @devSelectView = new DeviceSelectView(@btnDevSelect)
     @addClass "tool-bar-24px"
     @btnDevSelect.on "click", => @showDevSelectView()
+    
+    @portSelectView = new PortSelectView(@btnPortSelect)
+    @addClass "tool-bar-24px"
+    @btnPortSelect.on "click", => @showPortSelectView()
 
     guideOpt = { tooltip: "Guide", icon: "book", callback: @guideLink }
     guideBtn = new ToolbarButtonView(guideOpt)
@@ -57,3 +63,9 @@ module.exports = class TopToolbarView extends View
       alert "Please open or create a project"
     else
       @devSelectView.toggle()
+
+  showPortSelectView: ->
+    if atom.project.getPaths()[0] is undefined
+      alert "Please open or create a project"
+    else
+      @portSelectView.toggle()

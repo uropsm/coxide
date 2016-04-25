@@ -82,5 +82,6 @@ class CreateProjectView extends View
       @modalPanel.hide()
       atom.project.setPaths([projectPath])
       atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
+      atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:clear')
     else
       alert 'Invalid Workspace Path.'

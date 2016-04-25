@@ -12,6 +12,7 @@ fs = require 'fs-plus'
 {SelectListView} = require 'atom-space-pen-views'
 request = require 'request'
 rmdir = require 'rimraf'
+# serialport = require 'serialport'
 
 module.exports = Coxide =
   subscriptions: null
@@ -41,6 +42,8 @@ module.exports = Coxide =
                 'coxide:createProject': => @createProject(), 
                 'coxide:openProject': => @openProject(),
                 'coxide:closeProject': => @closeProject(),
+                'coxide:buildProject': => @buildProject(),
+                'coxide:cleanProject': => @cleanProject(),
                 'coxide:viewVersion': => @viewVersion(),
                 'coxide:viewLicense': => @viewLicense(),
                 'coxide:libUpdate': => @libUpdate(),
@@ -72,6 +75,7 @@ module.exports = Coxide =
           @projectPath = path[0]
           atom.project.setPaths(path)
           atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
+          atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:clear')
           @topToolbarView.loadTargetDevice()
         else
           alert 'No exist available project in this path.'
@@ -108,6 +112,7 @@ module.exports = Coxide =
 
   _clearProject: ->
     atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:detach')
+    atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:clear')
     atom.project.removePath(@projectPath)
     @projectPath = null
     @topToolbarView.clearTargetDevice()
@@ -122,6 +127,12 @@ module.exports = Coxide =
               item.save() if item.isModified() is true  
             item.destroy()
 
+  buildProject: ->
+    atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:trigger')
+
+  cleanProject: ->
+    atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:clean')
+            
   viewVersion: ->
     alert "Nol.A IDE version " + @_getIdeVersion() + "\nCopyright 2016 CoXlab Inc. All rights reserved."
 

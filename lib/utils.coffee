@@ -29,6 +29,18 @@ exports.getSeperator = ->
   else if platform is "win32" or platform is "win64"
     return "\\"
 
+exports.getCleanScriptPath = ->
+  installPath = utils.getInstallPath()
+  sep = utils.getSeperator()
+  platform = os.platform()
+  cleanScriptPath = ""
+  if platform is "linux" or platform is "darwin"
+    cleanScriptPath = sep + "cox-sdk" + sep + "make" + sep + "clean.cmd"
+  else if platform is "win32" or platform is "win64"
+    cleanScriptPath = sep + "cox-sdk" + sep + "make" + sep + "clean.sh"
+
+  return installPath + cleanScriptPath
+
 exports.getLicensePath = ->
   installPath = utils.getInstallPath()
   sep = utils.getSeperator()
@@ -62,3 +74,13 @@ exports.getPlatform = ->
   if platform == "win32" || platform == "win64"
     platform = "window"
   return platform
+
+exports.getPortList = ->
+  portList = ['None', 'JTAG']
+  platform = os.platform()
+  if platform == "win32" || platform == "win64"
+    for i in [1...30]
+      portList.push("COM"+i)
+  # else if platform == "linux"
+  # else if platform == "darwin"
+  return portList
