@@ -2,6 +2,8 @@ utils = require './utils'
 remote = require 'remote'
 app = remote.require('app')
 os = require 'os'
+wrench = require 'wrench'
+{XRegExp} = require 'xregexp'
 
 exports.getInstallPath = ->
   sep = ""
@@ -81,6 +83,11 @@ exports.getPortList = ->
   if platform == "win32" || platform == "win64"
     for i in [1...30]
       portList.push("COM"+i)
-  # else if platform == "linux"
+  else if platform == "linux"
+    dirInfo = wrench.readdirSyncRecursive('/dev');
+    dirXReg = XRegExp('tty.*' , 'gi');
+    for i in [0...dirInfo.length]
+      if XRegExp.exec(dirInfo[i], dirXReg) isnt null
+       portList.push(dirInfo[i])
   # else if platform == "darwin"
   return portList

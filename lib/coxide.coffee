@@ -12,7 +12,6 @@ fs = require 'fs-plus'
 {SelectListView} = require 'atom-space-pen-views'
 request = require 'request'
 rmdir = require 'rimraf'
-# serialport = require 'serialport'
 
 module.exports = Coxide =
   subscriptions: null

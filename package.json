@@ -16,7 +16,8 @@
     "request": "2.63.0",
     "unzip": "0.1.11",
     "rimraf": "2.4.3",
-    "wrench": "1.5.8"
+    "wrench": "1.5.8",
+    "xregexp": "^2.0.0"
   },
   "packagDependencies": {}
 }
