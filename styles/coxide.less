@@ -64,6 +64,33 @@
     }
   }
   
+  button.tool-bar-small-btn {
+    background-color: @base-background-color;
+    background-image: inherit;
+    border-color: @base-background-color;
+    cursor: pointer;
+    flex: 0 0 auto;
+    margin: @button-margin-size;
+    padding: 0;
+    text-align: left;
+    font-size: 18px;
+    padding-left: 10px;
+    
+    line-height: @size;
+    height: @size + (@button-border-size * 2);
+    width: 200px + (@button-border-size * 2);
+    &:before {
+      display: inline;
+      font-size: @size / 2;
+      line-height: @size;
+    }
+    &:focus,
+    &:hover {
+      border-color: @button-border-color;
+      outline: none;
+    }
+  }
+  
   button.tool-bar-long-btn {
     background-color: @base-background-color;
     background-image: inherit;

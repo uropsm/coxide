@@ -10,8 +10,8 @@ module.exports = class TopToolbarView extends View
   
   @content: ->
     @div class: 'coxide coxide-tool-bar', =>
+      @button outlet: 'btnPortSelect', class: 'pull-right btn btn-default tool-bar-small-btn icon icon-plug', 'JTAG'
       @button outlet: 'btnDevSelect', class: 'pull-right btn btn-default tool-bar-long-btn icon icon-check', 'Select Your Device'
-      @button outlet: 'btnPortSelect', class: 'pull-right btn btn-default tool-bar-long-btn icon icon-check', 'JTAG'
   items: []
 
   initialize: ->
