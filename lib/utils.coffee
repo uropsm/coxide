@@ -89,7 +89,7 @@ exports.getPortList = ->
     for i in [0...dirInfo.length]
       if XRegExp.exec(dirInfo[i], dirXReg) isnt null
        portList.push(dirInfo[i])
-  else if paltform == "darwin"
+  else if platform == "darwin"
     dirInfo = fs.listSync('/dev', '')
     dirXReg = XRegExp('tty\..*' , 'gi')
     for i in [0...dirInfo.length]
