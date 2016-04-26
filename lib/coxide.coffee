@@ -76,6 +76,7 @@ module.exports = Coxide =
           atom.commands.dispatch(atom.views.getView(atom.workspace), 'tree-view:show')
           atom.commands.dispatch(atom.views.getView(atom.workspace), 'build:clear')
           @topToolbarView.loadTargetDevice()
+          @topToolbarView.loadPort()
         else
           alert 'No exist available project in this path.'
     ipc.send('open-project', responseChannel)    
@@ -115,7 +116,8 @@ module.exports = Coxide =
     atom.project.removePath(@projectPath)
     @projectPath = null
     @topToolbarView.clearTargetDevice()
-  
+    @topToolbarView.clearPort()
+
   _closeFiles: (flag) ->
     panes = atom.workspace.getPanes() 
     for pane in panes 

@@ -57,6 +57,12 @@ module.exports = class TopToolbarView extends View
 
   clearTargetDevice: ->
     @devSelectView.clearDevice()
+  
+  loadPort: ->
+    @portSelectView.loadPort() 
+ 
+  clearPort: ->
+    @portSelectView.clearPort()  
 
   showDevSelectView: ->
     if atom.project.getPaths()[0] is undefined

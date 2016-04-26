@@ -54,6 +54,7 @@ class PortSelectView extends SelectListView
     if @panel?
       @cancel()
     else
+      @initPortList()
       @setItems(@portList)
       @attach()
 
@@ -70,5 +71,12 @@ class PortSelectView extends SelectListView
     catch e
       alert 'Error : .atom-build.json modification failure.'
 
-    
-      
+  loadPort: ->
+    @curPort = defaultPort
+    @btnPortSelect.text defaultPort
+    @savePort(defaultPort)
+
+  clearPort: ->
+    @curPort = defaultPort
+    @btnPortSelect.text defaultPort
+
